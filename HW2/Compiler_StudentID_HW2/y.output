@@ -1,0 +1,2152 @@
+Terminals which are not used
+
+   FOR
+   AND
+   OR
+   NOT
+   LSB
+   RSB
+
+
+Grammar
+
+    0 $accept: program $end
+
+    1 program: program external_declaration
+    2        | external_declaration
+
+    3 external_declaration: declaration
+    4                     | function_definition
+
+    5 function_definition: type_specifier declarator compound_statement
+
+    6 @1: /* empty */
+
+    7 compound_statement: LCB @1 RCB
+
+    8 @2: /* empty */
+
+    9 compound_statement: LCB @2 block_item_list RCB
+
+   10 block_item_list: block_item
+   11                | block_item_list block_item
+
+   12 block_item: declaration
+   13           | statement
+
+   14 statement: compound_statement
+   15          | expression_statement
+   16          | iteration_statement
+   17          | selection_statement
+   18          | jump_statement
+   19          | print_function
+
+   20 print_function: PRINT LB print_content RB SEMICOLON
+
+   21 print_content: STR_CONST
+   22              | ID
+
+   23 jump_statement: RET SEMICOLON
+   24               | RET expression SEMICOLON
+
+   25 selection_statement: IF LB expression RB statement
+   26                    | IF LB expression RB statement ELSE statement
+
+   27 iteration_statement: WHILE LB expression RB statement
+
+   28 expression_statement: SEMICOLON
+   29                     | expression SEMICOLON
+
+   30 expression: assignment_expression
+   31           | expression COMMA assignment_expression
+
+   32 declaration: type_specifier init_declarator SEMICOLON
+
+   33 init_declarator: declarator ASGN initializer
+   34                | declarator
+
+   35 declarator: direct_declarator
+
+   36 direct_declarator: ID
+
+   37 @3: /* empty */
+
+   38 direct_declarator: direct_declarator LB @3 RB
+
+   39 @4: /* empty */
+
+   40 direct_declarator: direct_declarator LB @4 parameter_type_list RB
+   41                  | direct_declarator LB identifier_list RB
+
+   42 identifier_list: ID
+   43                | identifier_list COMMA ID
+
+   44 parameter_type_list: parameter_list
+
+   45 parameter_list: parameter_declaration
+   46               | parameter_list COMMA parameter_declaration
+
+   47 parameter_declaration: type_specifier declarator
+
+   48 initializer: assignment_expression
+
+   49 assignment_expression: relational_expression
+   50                      | unary_expression assignment_operator assignment_expression
+
+   51 assignment_operator: ASGN
+   52                    | ADDASGN
+   53                    | SUBASGN
+   54                    | MULASGN
+   55                    | DIVASGN
+   56                    | MODASGN
+
+   57 relational_expression: additive_expression
+   58                      | relational_expression MT additive_expression
+   59                      | relational_expression LT additive_expression
+   60                      | relational_expression MTE additive_expression
+   61                      | relational_expression LTE additive_expression
+   62                      | relational_expression EQ additive_expression
+   63                      | relational_expression NE additive_expression
+
+   64 additive_expression: multiplicative_expression
+   65                    | additive_expression ADD multiplicative_expression
+   66                    | additive_expression SUB multiplicative_expression
+
+   67 multiplicative_expression: unary_expression
+   68                          | multiplicative_expression MUL unary_expression
+   69                          | multiplicative_expression DIV unary_expression
+   70                          | multiplicative_expression MOD unary_expression
+
+   71 unary_expression: postfix_expression
+   72                 | INC unary_expression
+   73                 | DEC unary_expression
+   74                 | unary_operation unary_expression
+
+   75 unary_operation: ADD
+   76                | SUB
+
+   77 postfix_expression: primary_expression
+   78                   | postfix_expression INC
+   79                   | postfix_expression DEC
+   80                   | postfix_expression LB argument_expression_list RB
+   81                   | postfix_expression LB RB
+
+   82 argument_expression_list: assignment_expression
+   83                         | argument_expression_list COMMA assignment_expression
+
+   84 primary_expression: ID
+   85                   | constant
+   86                   | string
+   87                   | boolean
+
+   88 boolean: TRUE
+   89        | FALSE
+
+   90 constant: I_CONST
+   91         | F_CONST
+
+   92 string: STR_CONST
+
+   93 type_specifier: INT
+   94               | FLOAT
+   95               | BOOL
+   96               | STRING
+   97               | VOID
+
+
+Terminals, with rules where they appear
+
+$end (0) 0
+error (256)
+PRINT (258) 20
+IF (259) 25 26
+ELSE (260) 26
+FOR (261)
+WHILE (262) 27
+SEMICOLON (263) 20 23 24 28 29 32
+ADD (264) 65 75
+SUB (265) 66 76
+MUL (266) 68
+DIV (267) 69
+MOD (268) 70
+INC (269) 72 78
+DEC (270) 73 79
+MT (271) 58
+LT (272) 59
+MTE (273) 60
+LTE (274) 61
+EQ (275) 62
+NE (276) 63
+ASGN (277) 33 51
+ADDASGN (278) 52
+SUBASGN (279) 53
+MULASGN (280) 54
+DIVASGN (281) 55
+MODASGN (282) 56
+AND (283)
+OR (284)
+NOT (285)
+LB (286) 20 25 26 27 38 40 41 80 81
+RB (287) 20 25 26 27 38 40 41 80 81
+LCB (288) 7 9
+RCB (289) 7 9
+LSB (290)
+RSB (291)
+COMMA (292) 31 43 46 83
+FALSE (293) 89
+TRUE (294) 88
+RET (295) 23 24
+THEN (296)
+I_CONST (297) 90
+F_CONST (298) 91
+STR_CONST (299) 21 92
+STRING (300) 96
+INT (301) 93
+FLOAT (302) 94
+BOOL (303) 95
+VOID (304) 97
+ID (305) 22 36 42 43 84
+
+
+Nonterminals, with rules where they appear
+
+$accept (51)
+    on left: 0
+program (52)
+    on left: 1 2, on right: 0 1
+external_declaration (53)
+    on left: 3 4, on right: 1 2
+function_definition (54)
+    on left: 5, on right: 4
+compound_statement (55)
+    on left: 7 9, on right: 5 14
+@1 (56)
+    on left: 6, on right: 7
+@2 (57)
+    on left: 8, on right: 9
+block_item_list (58)
+    on left: 10 11, on right: 9 11
+block_item (59)
+    on left: 12 13, on right: 10 11
+statement (60)
+    on left: 14 15 16 17 18 19, on right: 13 25 26 27
+print_function (61)
+    on left: 20, on right: 19
+print_content (62)
+    on left: 21 22, on right: 20
+jump_statement (63)
+    on left: 23 24, on right: 18
+selection_statement (64)
+    on left: 25 26, on right: 17
+iteration_statement (65)
+    on left: 27, on right: 16
+expression_statement (66)
+    on left: 28 29, on right: 15
+expression (67)
+    on left: 30 31, on right: 24 25 26 27 29 31
+declaration (68)
+    on left: 32, on right: 3 12
+init_declarator (69)
+    on left: 33 34, on right: 32
+declarator (70)
+    on left: 35, on right: 5 33 34 47
+direct_declarator (71)
+    on left: 36 38 40 41, on right: 35 38 40 41
+@3 (72)
+    on left: 37, on right: 38
+@4 (73)
+    on left: 39, on right: 40
+identifier_list (74)
+    on left: 42 43, on right: 41 43
+parameter_type_list (75)
+    on left: 44, on right: 40
+parameter_list (76)
+    on left: 45 46, on right: 44 46
+parameter_declaration (77)
+    on left: 47, on right: 45 46
+initializer (78)
+    on left: 48, on right: 33
+assignment_expression (79)
+    on left: 49 50, on right: 30 31 48 50 82 83
+assignment_operator (80)
+    on left: 51 52 53 54 55 56, on right: 50
+relational_expression (81)
+    on left: 57 58 59 60 61 62 63, on right: 49 58 59 60 61 62 63
+additive_expression (82)
+    on left: 64 65 66, on right: 57 58 59 60 61 62 63 65 66
+multiplicative_expression (83)
+    on left: 67 68 69 70, on right: 64 65 66 68 69 70
+unary_expression (84)
+    on left: 71 72 73 74, on right: 50 67 68 69 70 72 73 74
+unary_operation (85)
+    on left: 75 76, on right: 74
+postfix_expression (86)
+    on left: 77 78 79 80 81, on right: 71 78 79 80 81
+argument_expression_list (87)
+    on left: 82 83, on right: 80 83
+primary_expression (88)
+    on left: 84 85 86 87, on right: 77
+boolean (89)
+    on left: 88 89, on right: 87
+constant (90)
+    on left: 90 91, on right: 85
+string (91)
+    on left: 92, on right: 86
+type_specifier (92)
+    on left: 93 94 95 96 97, on right: 5 32 47
+
+
+state 0
+
+    0 $accept: . program $end
+
+    STRING  shift, and go to state 1
+    INT     shift, and go to state 2
+    FLOAT   shift, and go to state 3
+    BOOL    shift, and go to state 4
+    VOID    shift, and go to state 5
+
+    program               go to state 6
+    external_declaration  go to state 7
+    function_definition   go to state 8
+    declaration           go to state 9
+    type_specifier        go to state 10
+
+
+state 1
+
+   96 type_specifier: STRING .
+
+    $default  reduce using rule 96 (type_specifier)
+
+
+state 2
+
+   93 type_specifier: INT .
+
+    $default  reduce using rule 93 (type_specifier)
+
+
+state 3
+
+   94 type_specifier: FLOAT .
+
+    $default  reduce using rule 94 (type_specifier)
+
+
+state 4
+
+   95 type_specifier: BOOL .
+
+    $default  reduce using rule 95 (type_specifier)
+
+
+state 5
+
+   97 type_specifier: VOID .
+
+    $default  reduce using rule 97 (type_specifier)
+
+
+state 6
+
+    0 $accept: program . $end
+    1 program: program . external_declaration
+
+    $end    shift, and go to state 11
+    STRING  shift, and go to state 1
+    INT     shift, and go to state 2
+    FLOAT   shift, and go to state 3
+    BOOL    shift, and go to state 4
+    VOID    shift, and go to state 5
+
+    external_declaration  go to state 12
+    function_definition   go to state 8
+    declaration           go to state 9
+    type_specifier        go to state 10
+
+
+state 7
+
+    2 program: external_declaration .
+
+    $default  reduce using rule 2 (program)
+
+
+state 8
+
+    4 external_declaration: function_definition .
+
+    $default  reduce using rule 4 (external_declaration)
+
+
+state 9
+
+    3 external_declaration: declaration .
+
+    $default  reduce using rule 3 (external_declaration)
+
+
+state 10
+
+    5 function_definition: type_specifier . declarator compound_statement
+   32 declaration: type_specifier . init_declarator SEMICOLON
+
+    ID  shift, and go to state 13
+
+    init_declarator    go to state 14
+    declarator         go to state 15
+    direct_declarator  go to state 16
+
+
+state 11
+
+    0 $accept: program $end .
+
+    $default  accept
+
+
+state 12
+
+    1 program: program external_declaration .
+
+    $default  reduce using rule 1 (program)
+
+
+state 13
+
+   36 direct_declarator: ID .
+
+    $default  reduce using rule 36 (direct_declarator)
+
+
+state 14
+
+   32 declaration: type_specifier init_declarator . SEMICOLON
+
+    SEMICOLON  shift, and go to state 17
+
+
+state 15
+
+    5 function_definition: type_specifier declarator . compound_statement
+   33 init_declarator: declarator . ASGN initializer
+   34                | declarator .
+
+    ASGN  shift, and go to state 18
+    LCB   shift, and go to state 19
+
+    $default  reduce using rule 34 (init_declarator)
+
+    compound_statement  go to state 20
+
+
+state 16
+
+   35 declarator: direct_declarator .
+   38 direct_declarator: direct_declarator . LB @3 RB
+   40                  | direct_declarator . LB @4 parameter_type_list RB
+   41                  | direct_declarator . LB identifier_list RB
+
+    LB  shift, and go to state 21
+
+    $default  reduce using rule 35 (declarator)
+
+
+state 17
+
+   32 declaration: type_specifier init_declarator SEMICOLON .
+
+    $default  reduce using rule 32 (declaration)
+
+
+state 18
+
+   33 init_declarator: declarator ASGN . initializer
+
+    ADD        shift, and go to state 22
+    SUB        shift, and go to state 23
+    INC        shift, and go to state 24
+    DEC        shift, and go to state 25
+    FALSE      shift, and go to state 26
+    TRUE       shift, and go to state 27
+    I_CONST    shift, and go to state 28
+    F_CONST    shift, and go to state 29
+    STR_CONST  shift, and go to state 30
+    ID         shift, and go to state 31
+
+    initializer                go to state 32
+    assignment_expression      go to state 33
+    relational_expression      go to state 34
+    additive_expression        go to state 35
+    multiplicative_expression  go to state 36
+    unary_expression           go to state 37
+    unary_operation            go to state 38
+    postfix_expression         go to state 39
+    primary_expression         go to state 40
+    boolean                    go to state 41
+    constant                   go to state 42
+    string                     go to state 43
+
+
+state 19
+
+    7 compound_statement: LCB . @1 RCB
+    9                   | LCB . @2 block_item_list RCB
+
+    RCB       reduce using rule 6 (@1)
+    $default  reduce using rule 8 (@2)
+
+    @1  go to state 44
+    @2  go to state 45
+
+
+state 20
+
+    5 function_definition: type_specifier declarator compound_statement .
+
+    $default  reduce using rule 5 (function_definition)
+
+
+state 21
+
+   38 direct_declarator: direct_declarator LB . @3 RB
+   40                  | direct_declarator LB . @4 parameter_type_list RB
+   41                  | direct_declarator LB . identifier_list RB
+
+    ID  shift, and go to state 46
+
+    RB        reduce using rule 37 (@3)
+    $default  reduce using rule 39 (@4)
+
+    @3               go to state 47
+    @4               go to state 48
+    identifier_list  go to state 49
+
+
+state 22
+
+   75 unary_operation: ADD .
+
+    $default  reduce using rule 75 (unary_operation)
+
+
+state 23
+
+   76 unary_operation: SUB .
+
+    $default  reduce using rule 76 (unary_operation)
+
+
+state 24
+
+   72 unary_expression: INC . unary_expression
+
+    ADD        shift, and go to state 22
+    SUB        shift, and go to state 23
+    INC        shift, and go to state 24
+    DEC        shift, and go to state 25
+    FALSE      shift, and go to state 26
+    TRUE       shift, and go to state 27
+    I_CONST    shift, and go to state 28
+    F_CONST    shift, and go to state 29
+    STR_CONST  shift, and go to state 30
+    ID         shift, and go to state 31
+
+    unary_expression    go to state 50
+    unary_operation     go to state 38
+    postfix_expression  go to state 39
+    primary_expression  go to state 40
+    boolean             go to state 41
+    constant            go to state 42
+    string              go to state 43
+
+
+state 25
+
+   73 unary_expression: DEC . unary_expression
+
+    ADD        shift, and go to state 22
+    SUB        shift, and go to state 23
+    INC        shift, and go to state 24
+    DEC        shift, and go to state 25
+    FALSE      shift, and go to state 26
+    TRUE       shift, and go to state 27
+    I_CONST    shift, and go to state 28
+    F_CONST    shift, and go to state 29
+    STR_CONST  shift, and go to state 30
+    ID         shift, and go to state 31
+
+    unary_expression    go to state 51
+    unary_operation     go to state 38
+    postfix_expression  go to state 39
+    primary_expression  go to state 40
+    boolean             go to state 41
+    constant            go to state 42
+    string              go to state 43
+
+
+state 26
+
+   89 boolean: FALSE .
+
+    $default  reduce using rule 89 (boolean)
+
+
+state 27
+
+   88 boolean: TRUE .
+
+    $default  reduce using rule 88 (boolean)
+
+
+state 28
+
+   90 constant: I_CONST .
+
+    $default  reduce using rule 90 (constant)
+
+
+state 29
+
+   91 constant: F_CONST .
+
+    $default  reduce using rule 91 (constant)
+
+
+state 30
+
+   92 string: STR_CONST .
+
+    $default  reduce using rule 92 (string)
+
+
+state 31
+
+   84 primary_expression: ID .
+
+    $default  reduce using rule 84 (primary_expression)
+
+
+state 32
+
+   33 init_declarator: declarator ASGN initializer .
+
+    $default  reduce using rule 33 (init_declarator)
+
+
+state 33
+
+   48 initializer: assignment_expression .
+
+    $default  reduce using rule 48 (initializer)
+
+
+state 34
+
+   49 assignment_expression: relational_expression .
+   58 relational_expression: relational_expression . MT additive_expression
+   59                      | relational_expression . LT additive_expression
+   60                      | relational_expression . MTE additive_expression
+   61                      | relational_expression . LTE additive_expression
+   62                      | relational_expression . EQ additive_expression
+   63                      | relational_expression . NE additive_expression
+
+    MT   shift, and go to state 52
+    LT   shift, and go to state 53
+    MTE  shift, and go to state 54
+    LTE  shift, and go to state 55
+    EQ   shift, and go to state 56
+    NE   shift, and go to state 57
+
+    $default  reduce using rule 49 (assignment_expression)
+
+
+state 35
+
+   57 relational_expression: additive_expression .
+   65 additive_expression: additive_expression . ADD multiplicative_expression
+   66                    | additive_expression . SUB multiplicative_expression
+
+    ADD  shift, and go to state 58
+    SUB  shift, and go to state 59
+
+    $default  reduce using rule 57 (relational_expression)
+
+
+state 36
+
+   64 additive_expression: multiplicative_expression .
+   68 multiplicative_expression: multiplicative_expression . MUL unary_expression
+   69                          | multiplicative_expression . DIV unary_expression
+   70                          | multiplicative_expression . MOD unary_expression
+
+    MUL  shift, and go to state 60
+    DIV  shift, and go to state 61
+    MOD  shift, and go to state 62
+
+    $default  reduce using rule 64 (additive_expression)
+
+
+state 37
+
+   50 assignment_expression: unary_expression . assignment_operator assignment_expression
+   67 multiplicative_expression: unary_expression .
+
+    ASGN     shift, and go to state 63
+    ADDASGN  shift, and go to state 64
+    SUBASGN  shift, and go to state 65
+    MULASGN  shift, and go to state 66
+    DIVASGN  shift, and go to state 67
+    MODASGN  shift, and go to state 68
+
+    $default  reduce using rule 67 (multiplicative_expression)
+
+    assignment_operator  go to state 69
+
+
+state 38
+
+   74 unary_expression: unary_operation . unary_expression
+
+    ADD        shift, and go to state 22
+    SUB        shift, and go to state 23
+    INC        shift, and go to state 24
+    DEC        shift, and go to state 25
+    FALSE      shift, and go to state 26
+    TRUE       shift, and go to state 27
+    I_CONST    shift, and go to state 28
+    F_CONST    shift, and go to state 29
+    STR_CONST  shift, and go to state 30
+    ID         shift, and go to state 31
+
+    unary_expression    go to state 70
+    unary_operation     go to state 38
+    postfix_expression  go to state 39
+    primary_expression  go to state 40
+    boolean             go to state 41
+    constant            go to state 42
+    string              go to state 43
+
+
+state 39
+
+   71 unary_expression: postfix_expression .
+   78 postfix_expression: postfix_expression . INC
+   79                   | postfix_expression . DEC
+   80                   | postfix_expression . LB argument_expression_list RB
+   81                   | postfix_expression . LB RB
+
+    INC  shift, and go to state 71
+    DEC  shift, and go to state 72
+    LB   shift, and go to state 73
+
+    $default  reduce using rule 71 (unary_expression)
+
+
+state 40
+
+   77 postfix_expression: primary_expression .
+
+    $default  reduce using rule 77 (postfix_expression)
+
+
+state 41
+
+   87 primary_expression: boolean .
+
+    $default  reduce using rule 87 (primary_expression)
+
+
+state 42
+
+   85 primary_expression: constant .
+
+    $default  reduce using rule 85 (primary_expression)
+
+
+state 43
+
+   86 primary_expression: string .
+
+    $default  reduce using rule 86 (primary_expression)
+
+
+state 44
+
+    7 compound_statement: LCB @1 . RCB
+
+    RCB  shift, and go to state 74
+
+
+state 45
+
+    9 compound_statement: LCB @2 . block_item_list RCB
+
+    PRINT      shift, and go to state 75
+    IF         shift, and go to state 76
+    WHILE      shift, and go to state 77
+    SEMICOLON  shift, and go to state 78
+    ADD        shift, and go to state 22
+    SUB        shift, and go to state 23
+    INC        shift, and go to state 24
+    DEC        shift, and go to state 25
+    LCB        shift, and go to state 19
+    FALSE      shift, and go to state 26
+    TRUE       shift, and go to state 27
+    RET        shift, and go to state 79
+    I_CONST    shift, and go to state 28
+    F_CONST    shift, and go to state 29
+    STR_CONST  shift, and go to state 30
+    STRING     shift, and go to state 1
+    INT        shift, and go to state 2
+    FLOAT      shift, and go to state 3
+    BOOL       shift, and go to state 4
+    VOID       shift, and go to state 5
+    ID         shift, and go to state 31
+
+    compound_statement         go to state 80
+    block_item_list            go to state 81
+    block_item                 go to state 82
+    statement                  go to state 83
+    print_function             go to state 84
+    jump_statement             go to state 85
+    selection_statement        go to state 86
+    iteration_statement        go to state 87
+    expression_statement       go to state 88
+    expression                 go to state 89
+    declaration                go to state 90
+    assignment_expression      go to state 91
+    relational_expression      go to state 34
+    additive_expression        go to state 35
+    multiplicative_expression  go to state 36
+    unary_expression           go to state 37
+    unary_operation            go to state 38
+    postfix_expression         go to state 39
+    primary_expression         go to state 40
+    boolean                    go to state 41
+    constant                   go to state 42
+    string                     go to state 43
+    type_specifier             go to state 92
+
+
+state 46
+
+   42 identifier_list: ID .
+
+    $default  reduce using rule 42 (identifier_list)
+
+
+state 47
+
+   38 direct_declarator: direct_declarator LB @3 . RB
+
+    RB  shift, and go to state 93
+
+
+state 48
+
+   40 direct_declarator: direct_declarator LB @4 . parameter_type_list RB
+
+    STRING  shift, and go to state 1
+    INT     shift, and go to state 2
+    FLOAT   shift, and go to state 3
+    BOOL    shift, and go to state 4
+    VOID    shift, and go to state 5
+
+    parameter_type_list    go to state 94
+    parameter_list         go to state 95
+    parameter_declaration  go to state 96
+    type_specifier         go to state 97
+
+
+state 49
+
+   41 direct_declarator: direct_declarator LB identifier_list . RB
+   43 identifier_list: identifier_list . COMMA ID
+
+    RB     shift, and go to state 98
+    COMMA  shift, and go to state 99
+
+
+state 50
+
+   72 unary_expression: INC unary_expression .
+
+    $default  reduce using rule 72 (unary_expression)
+
+
+state 51
+
+   73 unary_expression: DEC unary_expression .
+
+    $default  reduce using rule 73 (unary_expression)
+
+
+state 52
+
+   58 relational_expression: relational_expression MT . additive_expression
+
+    ADD        shift, and go to state 22
+    SUB        shift, and go to state 23
+    INC        shift, and go to state 24
+    DEC        shift, and go to state 25
+    FALSE      shift, and go to state 26
+    TRUE       shift, and go to state 27
+    I_CONST    shift, and go to state 28
+    F_CONST    shift, and go to state 29
+    STR_CONST  shift, and go to state 30
+    ID         shift, and go to state 31
+
+    additive_expression        go to state 100
+    multiplicative_expression  go to state 36
+    unary_expression           go to state 101
+    unary_operation            go to state 38
+    postfix_expression         go to state 39
+    primary_expression         go to state 40
+    boolean                    go to state 41
+    constant                   go to state 42
+    string                     go to state 43
+
+
+state 53
+
+   59 relational_expression: relational_expression LT . additive_expression
+
+    ADD        shift, and go to state 22
+    SUB        shift, and go to state 23
+    INC        shift, and go to state 24
+    DEC        shift, and go to state 25
+    FALSE      shift, and go to state 26
+    TRUE       shift, and go to state 27
+    I_CONST    shift, and go to state 28
+    F_CONST    shift, and go to state 29
+    STR_CONST  shift, and go to state 30
+    ID         shift, and go to state 31
+
+    additive_expression        go to state 102
+    multiplicative_expression  go to state 36
+    unary_expression           go to state 101
+    unary_operation            go to state 38
+    postfix_expression         go to state 39
+    primary_expression         go to state 40
+    boolean                    go to state 41
+    constant                   go to state 42
+    string                     go to state 43
+
+
+state 54
+
+   60 relational_expression: relational_expression MTE . additive_expression
+
+    ADD        shift, and go to state 22
+    SUB        shift, and go to state 23
+    INC        shift, and go to state 24
+    DEC        shift, and go to state 25
+    FALSE      shift, and go to state 26
+    TRUE       shift, and go to state 27
+    I_CONST    shift, and go to state 28
+    F_CONST    shift, and go to state 29
+    STR_CONST  shift, and go to state 30
+    ID         shift, and go to state 31
+
+    additive_expression        go to state 103
+    multiplicative_expression  go to state 36
+    unary_expression           go to state 101
+    unary_operation            go to state 38
+    postfix_expression         go to state 39
+    primary_expression         go to state 40
+    boolean                    go to state 41
+    constant                   go to state 42
+    string                     go to state 43
+
+
+state 55
+
+   61 relational_expression: relational_expression LTE . additive_expression
+
+    ADD        shift, and go to state 22
+    SUB        shift, and go to state 23
+    INC        shift, and go to state 24
+    DEC        shift, and go to state 25
+    FALSE      shift, and go to state 26
+    TRUE       shift, and go to state 27
+    I_CONST    shift, and go to state 28
+    F_CONST    shift, and go to state 29
+    STR_CONST  shift, and go to state 30
+    ID         shift, and go to state 31
+
+    additive_expression        go to state 104
+    multiplicative_expression  go to state 36
+    unary_expression           go to state 101
+    unary_operation            go to state 38
+    postfix_expression         go to state 39
+    primary_expression         go to state 40
+    boolean                    go to state 41
+    constant                   go to state 42
+    string                     go to state 43
+
+
+state 56
+
+   62 relational_expression: relational_expression EQ . additive_expression
+
+    ADD        shift, and go to state 22
+    SUB        shift, and go to state 23
+    INC        shift, and go to state 24
+    DEC        shift, and go to state 25
+    FALSE      shift, and go to state 26
+    TRUE       shift, and go to state 27
+    I_CONST    shift, and go to state 28
+    F_CONST    shift, and go to state 29
+    STR_CONST  shift, and go to state 30
+    ID         shift, and go to state 31
+
+    additive_expression        go to state 105
+    multiplicative_expression  go to state 36
+    unary_expression           go to state 101
+    unary_operation            go to state 38
+    postfix_expression         go to state 39
+    primary_expression         go to state 40
+    boolean                    go to state 41
+    constant                   go to state 42
+    string                     go to state 43
+
+
+state 57
+
+   63 relational_expression: relational_expression NE . additive_expression
+
+    ADD        shift, and go to state 22
+    SUB        shift, and go to state 23
+    INC        shift, and go to state 24
+    DEC        shift, and go to state 25
+    FALSE      shift, and go to state 26
+    TRUE       shift, and go to state 27
+    I_CONST    shift, and go to state 28
+    F_CONST    shift, and go to state 29
+    STR_CONST  shift, and go to state 30
+    ID         shift, and go to state 31
+
+    additive_expression        go to state 106
+    multiplicative_expression  go to state 36
+    unary_expression           go to state 101
+    unary_operation            go to state 38
+    postfix_expression         go to state 39
+    primary_expression         go to state 40
+    boolean                    go to state 41
+    constant                   go to state 42
+    string                     go to state 43
+
+
+state 58
+
+   65 additive_expression: additive_expression ADD . multiplicative_expression
+
+    ADD        shift, and go to state 22
+    SUB        shift, and go to state 23
+    INC        shift, and go to state 24
+    DEC        shift, and go to state 25
+    FALSE      shift, and go to state 26
+    TRUE       shift, and go to state 27
+    I_CONST    shift, and go to state 28
+    F_CONST    shift, and go to state 29
+    STR_CONST  shift, and go to state 30
+    ID         shift, and go to state 31
+
+    multiplicative_expression  go to state 107
+    unary_expression           go to state 101
+    unary_operation            go to state 38
+    postfix_expression         go to state 39
+    primary_expression         go to state 40
+    boolean                    go to state 41
+    constant                   go to state 42
+    string                     go to state 43
+
+
+state 59
+
+   66 additive_expression: additive_expression SUB . multiplicative_expression
+
+    ADD        shift, and go to state 22
+    SUB        shift, and go to state 23
+    INC        shift, and go to state 24
+    DEC        shift, and go to state 25
+    FALSE      shift, and go to state 26
+    TRUE       shift, and go to state 27
+    I_CONST    shift, and go to state 28
+    F_CONST    shift, and go to state 29
+    STR_CONST  shift, and go to state 30
+    ID         shift, and go to state 31
+
+    multiplicative_expression  go to state 108
+    unary_expression           go to state 101
+    unary_operation            go to state 38
+    postfix_expression         go to state 39
+    primary_expression         go to state 40
+    boolean                    go to state 41
+    constant                   go to state 42
+    string                     go to state 43
+
+
+state 60
+
+   68 multiplicative_expression: multiplicative_expression MUL . unary_expression
+
+    ADD        shift, and go to state 22
+    SUB        shift, and go to state 23
+    INC        shift, and go to state 24
+    DEC        shift, and go to state 25
+    FALSE      shift, and go to state 26
+    TRUE       shift, and go to state 27
+    I_CONST    shift, and go to state 28
+    F_CONST    shift, and go to state 29
+    STR_CONST  shift, and go to state 30
+    ID         shift, and go to state 31
+
+    unary_expression    go to state 109
+    unary_operation     go to state 38
+    postfix_expression  go to state 39
+    primary_expression  go to state 40
+    boolean             go to state 41
+    constant            go to state 42
+    string              go to state 43
+
+
+state 61
+
+   69 multiplicative_expression: multiplicative_expression DIV . unary_expression
+
+    ADD        shift, and go to state 22
+    SUB        shift, and go to state 23
+    INC        shift, and go to state 24
+    DEC        shift, and go to state 25
+    FALSE      shift, and go to state 26
+    TRUE       shift, and go to state 27
+    I_CONST    shift, and go to state 28
+    F_CONST    shift, and go to state 29
+    STR_CONST  shift, and go to state 30
+    ID         shift, and go to state 31
+
+    unary_expression    go to state 110
+    unary_operation     go to state 38
+    postfix_expression  go to state 39
+    primary_expression  go to state 40
+    boolean             go to state 41
+    constant            go to state 42
+    string              go to state 43
+
+
+state 62
+
+   70 multiplicative_expression: multiplicative_expression MOD . unary_expression
+
+    ADD        shift, and go to state 22
+    SUB        shift, and go to state 23
+    INC        shift, and go to state 24
+    DEC        shift, and go to state 25
+    FALSE      shift, and go to state 26
+    TRUE       shift, and go to state 27
+    I_CONST    shift, and go to state 28
+    F_CONST    shift, and go to state 29
+    STR_CONST  shift, and go to state 30
+    ID         shift, and go to state 31
+
+    unary_expression    go to state 111
+    unary_operation     go to state 38
+    postfix_expression  go to state 39
+    primary_expression  go to state 40
+    boolean             go to state 41
+    constant            go to state 42
+    string              go to state 43
+
+
+state 63
+
+   51 assignment_operator: ASGN .
+
+    $default  reduce using rule 51 (assignment_operator)
+
+
+state 64
+
+   52 assignment_operator: ADDASGN .
+
+    $default  reduce using rule 52 (assignment_operator)
+
+
+state 65
+
+   53 assignment_operator: SUBASGN .
+
+    $default  reduce using rule 53 (assignment_operator)
+
+
+state 66
+
+   54 assignment_operator: MULASGN .
+
+    $default  reduce using rule 54 (assignment_operator)
+
+
+state 67
+
+   55 assignment_operator: DIVASGN .
+
+    $default  reduce using rule 55 (assignment_operator)
+
+
+state 68
+
+   56 assignment_operator: MODASGN .
+
+    $default  reduce using rule 56 (assignment_operator)
+
+
+state 69
+
+   50 assignment_expression: unary_expression assignment_operator . assignment_expression
+
+    ADD        shift, and go to state 22
+    SUB        shift, and go to state 23
+    INC        shift, and go to state 24
+    DEC        shift, and go to state 25
+    FALSE      shift, and go to state 26
+    TRUE       shift, and go to state 27
+    I_CONST    shift, and go to state 28
+    F_CONST    shift, and go to state 29
+    STR_CONST  shift, and go to state 30
+    ID         shift, and go to state 31
+
+    assignment_expression      go to state 112
+    relational_expression      go to state 34
+    additive_expression        go to state 35
+    multiplicative_expression  go to state 36
+    unary_expression           go to state 37
+    unary_operation            go to state 38
+    postfix_expression         go to state 39
+    primary_expression         go to state 40
+    boolean                    go to state 41
+    constant                   go to state 42
+    string                     go to state 43
+
+
+state 70
+
+   74 unary_expression: unary_operation unary_expression .
+
+    $default  reduce using rule 74 (unary_expression)
+
+
+state 71
+
+   78 postfix_expression: postfix_expression INC .
+
+    $default  reduce using rule 78 (postfix_expression)
+
+
+state 72
+
+   79 postfix_expression: postfix_expression DEC .
+
+    $default  reduce using rule 79 (postfix_expression)
+
+
+state 73
+
+   80 postfix_expression: postfix_expression LB . argument_expression_list RB
+   81                   | postfix_expression LB . RB
+
+    ADD        shift, and go to state 22
+    SUB        shift, and go to state 23
+    INC        shift, and go to state 24
+    DEC        shift, and go to state 25
+    RB         shift, and go to state 113
+    FALSE      shift, and go to state 26
+    TRUE       shift, and go to state 27
+    I_CONST    shift, and go to state 28
+    F_CONST    shift, and go to state 29
+    STR_CONST  shift, and go to state 30
+    ID         shift, and go to state 31
+
+    assignment_expression      go to state 114
+    relational_expression      go to state 34
+    additive_expression        go to state 35
+    multiplicative_expression  go to state 36
+    unary_expression           go to state 37
+    unary_operation            go to state 38
+    postfix_expression         go to state 39
+    argument_expression_list   go to state 115
+    primary_expression         go to state 40
+    boolean                    go to state 41
+    constant                   go to state 42
+    string                     go to state 43
+
+
+state 74
+
+    7 compound_statement: LCB @1 RCB .
+
+    $default  reduce using rule 7 (compound_statement)
+
+
+state 75
+
+   20 print_function: PRINT . LB print_content RB SEMICOLON
+
+    LB  shift, and go to state 116
+
+
+state 76
+
+   25 selection_statement: IF . LB expression RB statement
+   26                    | IF . LB expression RB statement ELSE statement
+
+    LB  shift, and go to state 117
+
+
+state 77
+
+   27 iteration_statement: WHILE . LB expression RB statement
+
+    LB  shift, and go to state 118
+
+
+state 78
+
+   28 expression_statement: SEMICOLON .
+
+    $default  reduce using rule 28 (expression_statement)
+
+
+state 79
+
+   23 jump_statement: RET . SEMICOLON
+   24               | RET . expression SEMICOLON
+
+    SEMICOLON  shift, and go to state 119
+    ADD        shift, and go to state 22
+    SUB        shift, and go to state 23
+    INC        shift, and go to state 24
+    DEC        shift, and go to state 25
+    FALSE      shift, and go to state 26
+    TRUE       shift, and go to state 27
+    I_CONST    shift, and go to state 28
+    F_CONST    shift, and go to state 29
+    STR_CONST  shift, and go to state 30
+    ID         shift, and go to state 31
+
+    expression                 go to state 120
+    assignment_expression      go to state 91
+    relational_expression      go to state 34
+    additive_expression        go to state 35
+    multiplicative_expression  go to state 36
+    unary_expression           go to state 37
+    unary_operation            go to state 38
+    postfix_expression         go to state 39
+    primary_expression         go to state 40
+    boolean                    go to state 41
+    constant                   go to state 42
+    string                     go to state 43
+
+
+state 80
+
+   14 statement: compound_statement .
+
+    $default  reduce using rule 14 (statement)
+
+
+state 81
+
+    9 compound_statement: LCB @2 block_item_list . RCB
+   11 block_item_list: block_item_list . block_item
+
+    PRINT      shift, and go to state 75
+    IF         shift, and go to state 76
+    WHILE      shift, and go to state 77
+    SEMICOLON  shift, and go to state 78
+    ADD        shift, and go to state 22
+    SUB        shift, and go to state 23
+    INC        shift, and go to state 24
+    DEC        shift, and go to state 25
+    LCB        shift, and go to state 19
+    RCB        shift, and go to state 121
+    FALSE      shift, and go to state 26
+    TRUE       shift, and go to state 27
+    RET        shift, and go to state 79
+    I_CONST    shift, and go to state 28
+    F_CONST    shift, and go to state 29
+    STR_CONST  shift, and go to state 30
+    STRING     shift, and go to state 1
+    INT        shift, and go to state 2
+    FLOAT      shift, and go to state 3
+    BOOL       shift, and go to state 4
+    VOID       shift, and go to state 5
+    ID         shift, and go to state 31
+
+    compound_statement         go to state 80
+    block_item                 go to state 122
+    statement                  go to state 83
+    print_function             go to state 84
+    jump_statement             go to state 85
+    selection_statement        go to state 86
+    iteration_statement        go to state 87
+    expression_statement       go to state 88
+    expression                 go to state 89
+    declaration                go to state 90
+    assignment_expression      go to state 91
+    relational_expression      go to state 34
+    additive_expression        go to state 35
+    multiplicative_expression  go to state 36
+    unary_expression           go to state 37
+    unary_operation            go to state 38
+    postfix_expression         go to state 39
+    primary_expression         go to state 40
+    boolean                    go to state 41
+    constant                   go to state 42
+    string                     go to state 43
+    type_specifier             go to state 92
+
+
+state 82
+
+   10 block_item_list: block_item .
+
+    $default  reduce using rule 10 (block_item_list)
+
+
+state 83
+
+   13 block_item: statement .
+
+    $default  reduce using rule 13 (block_item)
+
+
+state 84
+
+   19 statement: print_function .
+
+    $default  reduce using rule 19 (statement)
+
+
+state 85
+
+   18 statement: jump_statement .
+
+    $default  reduce using rule 18 (statement)
+
+
+state 86
+
+   17 statement: selection_statement .
+
+    $default  reduce using rule 17 (statement)
+
+
+state 87
+
+   16 statement: iteration_statement .
+
+    $default  reduce using rule 16 (statement)
+
+
+state 88
+
+   15 statement: expression_statement .
+
+    $default  reduce using rule 15 (statement)
+
+
+state 89
+
+   29 expression_statement: expression . SEMICOLON
+   31 expression: expression . COMMA assignment_expression
+
+    SEMICOLON  shift, and go to state 123
+    COMMA      shift, and go to state 124
+
+
+state 90
+
+   12 block_item: declaration .
+
+    $default  reduce using rule 12 (block_item)
+
+
+state 91
+
+   30 expression: assignment_expression .
+
+    $default  reduce using rule 30 (expression)
+
+
+state 92
+
+   32 declaration: type_specifier . init_declarator SEMICOLON
+
+    ID  shift, and go to state 13
+
+    init_declarator    go to state 14
+    declarator         go to state 125
+    direct_declarator  go to state 16
+
+
+state 93
+
+   38 direct_declarator: direct_declarator LB @3 RB .
+
+    $default  reduce using rule 38 (direct_declarator)
+
+
+state 94
+
+   40 direct_declarator: direct_declarator LB @4 parameter_type_list . RB
+
+    RB  shift, and go to state 126
+
+
+state 95
+
+   44 parameter_type_list: parameter_list .
+   46 parameter_list: parameter_list . COMMA parameter_declaration
+
+    COMMA  shift, and go to state 127
+
+    $default  reduce using rule 44 (parameter_type_list)
+
+
+state 96
+
+   45 parameter_list: parameter_declaration .
+
+    $default  reduce using rule 45 (parameter_list)
+
+
+state 97
+
+   47 parameter_declaration: type_specifier . declarator
+
+    ID  shift, and go to state 13
+
+    declarator         go to state 128
+    direct_declarator  go to state 16
+
+
+state 98
+
+   41 direct_declarator: direct_declarator LB identifier_list RB .
+
+    $default  reduce using rule 41 (direct_declarator)
+
+
+state 99
+
+   43 identifier_list: identifier_list COMMA . ID
+
+    ID  shift, and go to state 129
+
+
+state 100
+
+   58 relational_expression: relational_expression MT additive_expression .
+   65 additive_expression: additive_expression . ADD multiplicative_expression
+   66                    | additive_expression . SUB multiplicative_expression
+
+    ADD  shift, and go to state 58
+    SUB  shift, and go to state 59
+
+    $default  reduce using rule 58 (relational_expression)
+
+
+state 101
+
+   67 multiplicative_expression: unary_expression .
+
+    $default  reduce using rule 67 (multiplicative_expression)
+
+
+state 102
+
+   59 relational_expression: relational_expression LT additive_expression .
+   65 additive_expression: additive_expression . ADD multiplicative_expression
+   66                    | additive_expression . SUB multiplicative_expression
+
+    ADD  shift, and go to state 58
+    SUB  shift, and go to state 59
+
+    $default  reduce using rule 59 (relational_expression)
+
+
+state 103
+
+   60 relational_expression: relational_expression MTE additive_expression .
+   65 additive_expression: additive_expression . ADD multiplicative_expression
+   66                    | additive_expression . SUB multiplicative_expression
+
+    ADD  shift, and go to state 58
+    SUB  shift, and go to state 59
+
+    $default  reduce using rule 60 (relational_expression)
+
+
+state 104
+
+   61 relational_expression: relational_expression LTE additive_expression .
+   65 additive_expression: additive_expression . ADD multiplicative_expression
+   66                    | additive_expression . SUB multiplicative_expression
+
+    ADD  shift, and go to state 58
+    SUB  shift, and go to state 59
+
+    $default  reduce using rule 61 (relational_expression)
+
+
+state 105
+
+   62 relational_expression: relational_expression EQ additive_expression .
+   65 additive_expression: additive_expression . ADD multiplicative_expression
+   66                    | additive_expression . SUB multiplicative_expression
+
+    ADD  shift, and go to state 58
+    SUB  shift, and go to state 59
+
+    $default  reduce using rule 62 (relational_expression)
+
+
+state 106
+
+   63 relational_expression: relational_expression NE additive_expression .
+   65 additive_expression: additive_expression . ADD multiplicative_expression
+   66                    | additive_expression . SUB multiplicative_expression
+
+    ADD  shift, and go to state 58
+    SUB  shift, and go to state 59
+
+    $default  reduce using rule 63 (relational_expression)
+
+
+state 107
+
+   65 additive_expression: additive_expression ADD multiplicative_expression .
+   68 multiplicative_expression: multiplicative_expression . MUL unary_expression
+   69                          | multiplicative_expression . DIV unary_expression
+   70                          | multiplicative_expression . MOD unary_expression
+
+    MUL  shift, and go to state 60
+    DIV  shift, and go to state 61
+    MOD  shift, and go to state 62
+
+    $default  reduce using rule 65 (additive_expression)
+
+
+state 108
+
+   66 additive_expression: additive_expression SUB multiplicative_expression .
+   68 multiplicative_expression: multiplicative_expression . MUL unary_expression
+   69                          | multiplicative_expression . DIV unary_expression
+   70                          | multiplicative_expression . MOD unary_expression
+
+    MUL  shift, and go to state 60
+    DIV  shift, and go to state 61
+    MOD  shift, and go to state 62
+
+    $default  reduce using rule 66 (additive_expression)
+
+
+state 109
+
+   68 multiplicative_expression: multiplicative_expression MUL unary_expression .
+
+    $default  reduce using rule 68 (multiplicative_expression)
+
+
+state 110
+
+   69 multiplicative_expression: multiplicative_expression DIV unary_expression .
+
+    $default  reduce using rule 69 (multiplicative_expression)
+
+
+state 111
+
+   70 multiplicative_expression: multiplicative_expression MOD unary_expression .
+
+    $default  reduce using rule 70 (multiplicative_expression)
+
+
+state 112
+
+   50 assignment_expression: unary_expression assignment_operator assignment_expression .
+
+    $default  reduce using rule 50 (assignment_expression)
+
+
+state 113
+
+   81 postfix_expression: postfix_expression LB RB .
+
+    $default  reduce using rule 81 (postfix_expression)
+
+
+state 114
+
+   82 argument_expression_list: assignment_expression .
+
+    $default  reduce using rule 82 (argument_expression_list)
+
+
+state 115
+
+   80 postfix_expression: postfix_expression LB argument_expression_list . RB
+   83 argument_expression_list: argument_expression_list . COMMA assignment_expression
+
+    RB     shift, and go to state 130
+    COMMA  shift, and go to state 131
+
+
+state 116
+
+   20 print_function: PRINT LB . print_content RB SEMICOLON
+
+    STR_CONST  shift, and go to state 132
+    ID         shift, and go to state 133
+
+    print_content  go to state 134
+
+
+state 117
+
+   25 selection_statement: IF LB . expression RB statement
+   26                    | IF LB . expression RB statement ELSE statement
+
+    ADD        shift, and go to state 22
+    SUB        shift, and go to state 23
+    INC        shift, and go to state 24
+    DEC        shift, and go to state 25
+    FALSE      shift, and go to state 26
+    TRUE       shift, and go to state 27
+    I_CONST    shift, and go to state 28
+    F_CONST    shift, and go to state 29
+    STR_CONST  shift, and go to state 30
+    ID         shift, and go to state 31
+
+    expression                 go to state 135
+    assignment_expression      go to state 91
+    relational_expression      go to state 34
+    additive_expression        go to state 35
+    multiplicative_expression  go to state 36
+    unary_expression           go to state 37
+    unary_operation            go to state 38
+    postfix_expression         go to state 39
+    primary_expression         go to state 40
+    boolean                    go to state 41
+    constant                   go to state 42
+    string                     go to state 43
+
+
+state 118
+
+   27 iteration_statement: WHILE LB . expression RB statement
+
+    ADD        shift, and go to state 22
+    SUB        shift, and go to state 23
+    INC        shift, and go to state 24
+    DEC        shift, and go to state 25
+    FALSE      shift, and go to state 26
+    TRUE       shift, and go to state 27
+    I_CONST    shift, and go to state 28
+    F_CONST    shift, and go to state 29
+    STR_CONST  shift, and go to state 30
+    ID         shift, and go to state 31
+
+    expression                 go to state 136
+    assignment_expression      go to state 91
+    relational_expression      go to state 34
+    additive_expression        go to state 35
+    multiplicative_expression  go to state 36
+    unary_expression           go to state 37
+    unary_operation            go to state 38
+    postfix_expression         go to state 39
+    primary_expression         go to state 40
+    boolean                    go to state 41
+    constant                   go to state 42
+    string                     go to state 43
+
+
+state 119
+
+   23 jump_statement: RET SEMICOLON .
+
+    $default  reduce using rule 23 (jump_statement)
+
+
+state 120
+
+   24 jump_statement: RET expression . SEMICOLON
+   31 expression: expression . COMMA assignment_expression
+
+    SEMICOLON  shift, and go to state 137
+    COMMA      shift, and go to state 124
+
+
+state 121
+
+    9 compound_statement: LCB @2 block_item_list RCB .
+
+    $default  reduce using rule 9 (compound_statement)
+
+
+state 122
+
+   11 block_item_list: block_item_list block_item .
+
+    $default  reduce using rule 11 (block_item_list)
+
+
+state 123
+
+   29 expression_statement: expression SEMICOLON .
+
+    $default  reduce using rule 29 (expression_statement)
+
+
+state 124
+
+   31 expression: expression COMMA . assignment_expression
+
+    ADD        shift, and go to state 22
+    SUB        shift, and go to state 23
+    INC        shift, and go to state 24
+    DEC        shift, and go to state 25
+    FALSE      shift, and go to state 26
+    TRUE       shift, and go to state 27
+    I_CONST    shift, and go to state 28
+    F_CONST    shift, and go to state 29
+    STR_CONST  shift, and go to state 30
+    ID         shift, and go to state 31
+
+    assignment_expression      go to state 138
+    relational_expression      go to state 34
+    additive_expression        go to state 35
+    multiplicative_expression  go to state 36
+    unary_expression           go to state 37
+    unary_operation            go to state 38
+    postfix_expression         go to state 39
+    primary_expression         go to state 40
+    boolean                    go to state 41
+    constant                   go to state 42
+    string                     go to state 43
+
+
+state 125
+
+   33 init_declarator: declarator . ASGN initializer
+   34                | declarator .
+
+    ASGN  shift, and go to state 18
+
+    $default  reduce using rule 34 (init_declarator)
+
+
+state 126
+
+   40 direct_declarator: direct_declarator LB @4 parameter_type_list RB .
+
+    $default  reduce using rule 40 (direct_declarator)
+
+
+state 127
+
+   46 parameter_list: parameter_list COMMA . parameter_declaration
+
+    STRING  shift, and go to state 1
+    INT     shift, and go to state 2
+    FLOAT   shift, and go to state 3
+    BOOL    shift, and go to state 4
+    VOID    shift, and go to state 5
+
+    parameter_declaration  go to state 139
+    type_specifier         go to state 97
+
+
+state 128
+
+   47 parameter_declaration: type_specifier declarator .
+
+    $default  reduce using rule 47 (parameter_declaration)
+
+
+state 129
+
+   43 identifier_list: identifier_list COMMA ID .
+
+    $default  reduce using rule 43 (identifier_list)
+
+
+state 130
+
+   80 postfix_expression: postfix_expression LB argument_expression_list RB .
+
+    $default  reduce using rule 80 (postfix_expression)
+
+
+state 131
+
+   83 argument_expression_list: argument_expression_list COMMA . assignment_expression
+
+    ADD        shift, and go to state 22
+    SUB        shift, and go to state 23
+    INC        shift, and go to state 24
+    DEC        shift, and go to state 25
+    FALSE      shift, and go to state 26
+    TRUE       shift, and go to state 27
+    I_CONST    shift, and go to state 28
+    F_CONST    shift, and go to state 29
+    STR_CONST  shift, and go to state 30
+    ID         shift, and go to state 31
+
+    assignment_expression      go to state 140
+    relational_expression      go to state 34
+    additive_expression        go to state 35
+    multiplicative_expression  go to state 36
+    unary_expression           go to state 37
+    unary_operation            go to state 38
+    postfix_expression         go to state 39
+    primary_expression         go to state 40
+    boolean                    go to state 41
+    constant                   go to state 42
+    string                     go to state 43
+
+
+state 132
+
+   21 print_content: STR_CONST .
+
+    $default  reduce using rule 21 (print_content)
+
+
+state 133
+
+   22 print_content: ID .
+
+    $default  reduce using rule 22 (print_content)
+
+
+state 134
+
+   20 print_function: PRINT LB print_content . RB SEMICOLON
+
+    RB  shift, and go to state 141
+
+
+state 135
+
+   25 selection_statement: IF LB expression . RB statement
+   26                    | IF LB expression . RB statement ELSE statement
+   31 expression: expression . COMMA assignment_expression
+
+    RB     shift, and go to state 142
+    COMMA  shift, and go to state 124
+
+
+state 136
+
+   27 iteration_statement: WHILE LB expression . RB statement
+   31 expression: expression . COMMA assignment_expression
+
+    RB     shift, and go to state 143
+    COMMA  shift, and go to state 124
+
+
+state 137
+
+   24 jump_statement: RET expression SEMICOLON .
+
+    $default  reduce using rule 24 (jump_statement)
+
+
+state 138
+
+   31 expression: expression COMMA assignment_expression .
+
+    $default  reduce using rule 31 (expression)
+
+
+state 139
+
+   46 parameter_list: parameter_list COMMA parameter_declaration .
+
+    $default  reduce using rule 46 (parameter_list)
+
+
+state 140
+
+   83 argument_expression_list: argument_expression_list COMMA assignment_expression .
+
+    $default  reduce using rule 83 (argument_expression_list)
+
+
+state 141
+
+   20 print_function: PRINT LB print_content RB . SEMICOLON
+
+    SEMICOLON  shift, and go to state 144
+
+
+state 142
+
+   25 selection_statement: IF LB expression RB . statement
+   26                    | IF LB expression RB . statement ELSE statement
+
+    PRINT      shift, and go to state 75
+    IF         shift, and go to state 76
+    WHILE      shift, and go to state 77
+    SEMICOLON  shift, and go to state 78
+    ADD        shift, and go to state 22
+    SUB        shift, and go to state 23
+    INC        shift, and go to state 24
+    DEC        shift, and go to state 25
+    LCB        shift, and go to state 19
+    FALSE      shift, and go to state 26
+    TRUE       shift, and go to state 27
+    RET        shift, and go to state 79
+    I_CONST    shift, and go to state 28
+    F_CONST    shift, and go to state 29
+    STR_CONST  shift, and go to state 30
+    ID         shift, and go to state 31
+
+    compound_statement         go to state 80
+    statement                  go to state 145
+    print_function             go to state 84
+    jump_statement             go to state 85
+    selection_statement        go to state 86
+    iteration_statement        go to state 87
+    expression_statement       go to state 88
+    expression                 go to state 89
+    assignment_expression      go to state 91
+    relational_expression      go to state 34
+    additive_expression        go to state 35
+    multiplicative_expression  go to state 36
+    unary_expression           go to state 37
+    unary_operation            go to state 38
+    postfix_expression         go to state 39
+    primary_expression         go to state 40
+    boolean                    go to state 41
+    constant                   go to state 42
+    string                     go to state 43
+
+
+state 143
+
+   27 iteration_statement: WHILE LB expression RB . statement
+
+    PRINT      shift, and go to state 75
+    IF         shift, and go to state 76
+    WHILE      shift, and go to state 77
+    SEMICOLON  shift, and go to state 78
+    ADD        shift, and go to state 22
+    SUB        shift, and go to state 23
+    INC        shift, and go to state 24
+    DEC        shift, and go to state 25
+    LCB        shift, and go to state 19
+    FALSE      shift, and go to state 26
+    TRUE       shift, and go to state 27
+    RET        shift, and go to state 79
+    I_CONST    shift, and go to state 28
+    F_CONST    shift, and go to state 29
+    STR_CONST  shift, and go to state 30
+    ID         shift, and go to state 31
+
+    compound_statement         go to state 80
+    statement                  go to state 146
+    print_function             go to state 84
+    jump_statement             go to state 85
+    selection_statement        go to state 86
+    iteration_statement        go to state 87
+    expression_statement       go to state 88
+    expression                 go to state 89
+    assignment_expression      go to state 91
+    relational_expression      go to state 34
+    additive_expression        go to state 35
+    multiplicative_expression  go to state 36
+    unary_expression           go to state 37
+    unary_operation            go to state 38
+    postfix_expression         go to state 39
+    primary_expression         go to state 40
+    boolean                    go to state 41
+    constant                   go to state 42
+    string                     go to state 43
+
+
+state 144
+
+   20 print_function: PRINT LB print_content RB SEMICOLON .
+
+    $default  reduce using rule 20 (print_function)
+
+
+state 145
+
+   25 selection_statement: IF LB expression RB statement .
+   26                    | IF LB expression RB statement . ELSE statement
+
+    ELSE  shift, and go to state 147
+
+    $default  reduce using rule 25 (selection_statement)
+
+
+state 146
+
+   27 iteration_statement: WHILE LB expression RB statement .
+
+    $default  reduce using rule 27 (iteration_statement)
+
+
+state 147
+
+   26 selection_statement: IF LB expression RB statement ELSE . statement
+
+    PRINT      shift, and go to state 75
+    IF         shift, and go to state 76
+    WHILE      shift, and go to state 77
+    SEMICOLON  shift, and go to state 78
+    ADD        shift, and go to state 22
+    SUB        shift, and go to state 23
+    INC        shift, and go to state 24
+    DEC        shift, and go to state 25
+    LCB        shift, and go to state 19
+    FALSE      shift, and go to state 26
+    TRUE       shift, and go to state 27
+    RET        shift, and go to state 79
+    I_CONST    shift, and go to state 28
+    F_CONST    shift, and go to state 29
+    STR_CONST  shift, and go to state 30
+    ID         shift, and go to state 31
+
+    compound_statement         go to state 80
+    statement                  go to state 148
+    print_function             go to state 84
+    jump_statement             go to state 85
+    selection_statement        go to state 86
+    iteration_statement        go to state 87
+    expression_statement       go to state 88
+    expression                 go to state 89
+    assignment_expression      go to state 91
+    relational_expression      go to state 34
+    additive_expression        go to state 35
+    multiplicative_expression  go to state 36
+    unary_expression           go to state 37
+    unary_operation            go to state 38
+    postfix_expression         go to state 39
+    primary_expression         go to state 40
+    boolean                    go to state 41
+    constant                   go to state 42
+    string                     go to state 43
+
+
+state 148
+
+   26 selection_statement: IF LB expression RB statement ELSE statement .
+
+    $default  reduce using rule 26 (selection_statement)
