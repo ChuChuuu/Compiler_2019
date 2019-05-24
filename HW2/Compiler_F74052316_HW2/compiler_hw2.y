@@ -223,7 +223,6 @@ declaration
 				print_semantic_flag =1;
 				strcat(message_buf,"Redeclared function ");
                 strcat(message_buf,$2);
-				printf("test\n");
 			}
 		}
 		else{
@@ -505,7 +504,6 @@ void insert_symbol(char* name,char* type,char* kind,char* attribute) {
 void insert_func_implement(char* name){
 	int i;
 	for( i = 0 ; i < Current->var_index;i++){
-		Current->STable[i].implementation_flag = 0;
 		if(strcmp(name,Current->STable[i].name)==0){
 			Current->STable[i].implementation_flag = 1;
 		}
