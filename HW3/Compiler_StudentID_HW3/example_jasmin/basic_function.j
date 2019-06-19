@@ -22,7 +22,7 @@
 .limit stack 50
 .limit locals 50
 	iload 0
-	ldc 4
+	ldc 6
 	iadd
 	istore 0
 	iload 0
@@ -42,7 +42,7 @@
 .limit locals 50
 	ldc 0
 	istore 0
-	ldc 6
+	ldc 4
 	invokestatic compiler_hw3/foo(I)I
 	istore 0
 	iload 0
