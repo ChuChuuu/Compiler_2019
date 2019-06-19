@@ -25,6 +25,7 @@ int assign_right;//看id是不是在“=”右邊
 int exe_float_flag;//看運算式中有沒有出現float的符號
 int isFun_flag;//現在用來看如果expression是function或是可以單獨做的話就要load出來
 int isWhile_flag;//用來看是while的話就算沒有“=”也要可以load
+int isIf_flag;//用來看是if的話就算沒有“=”也要可以load
 int isReturn_flag;//用來看現在這個ID是不是用來return的
 int noinitial_flag;//用來看宣告的變數有沒有初始化
 int declare_zero;//用來看declare的是不是zero
@@ -33,7 +34,12 @@ char function_arg_type[10];//用來存functon的引數buf
 int look_function_type_flag;//看一開始function是什麼type，return就要什麼type
 void lookfunction_att(char* fun_name);//用來找一個function的type 是合起來的形式ex.II,
 char att_buf[10];//用來借存lookfunction_att的結果
-int while_label_num;//用來記住while用的labe
+int while_label_num;//用來記住while用的label
+int while_label_stack;//用來記現在在哪個stack
+int while_stack[50];//label的stack
+int if_label_num;//用來記住if用的label
+int if_label_stack;//用來記現在在哪個stack
+int if_stack[50];//用來記住if用的label
 /* Symbol table function - you can add new function if needed. */
 int lookup_symbol(char* name,char* kind);
 int lookup_global(char* name,char* kind);
@@ -395,6 +401,7 @@ jump_statement
 		//應該不用在這裡初始化，因為有可能function中有複數個return嗎？
 	}
 	|RET{isReturn_flag = 1;} expression SEMICOLON{
+		exe_float_flag = 0;
 		isReturn_flag = 0;//return的flag要歸回
 		printf("return:%s\n",$3);
 		//如果reutrn的type與function有一致
@@ -418,18 +425,63 @@ jump_statement
 		
 	}
 ;
-selection_statement
-	:IF LB expression RB statement %prec THEN{
-		writeCode("test2");
+if_condition
+	:IF {isIf_flag = 1;}LB expression RB{
+	    isIf_flag = 0;//while判斷的結束
+		//把label++
+		if_label_num++;
+		if_label_stack++;
+		//放進stack
+		if_stack[if_label_stack] = if_label_num;
+        printf("compare:%s\n",$4);
+        //判斷是什麼compare，如果是錯的就跳轉
+        if( strcmp($4,"MT") == 0 || strcmp($4,"LT") == 0){
+            sprintf(Jcode_buf,"\tifle LABEL_IF_FALSE_%d",if_stack[if_label_stack]);
+        }
+        else if( strcmp($4,"MTE") == 0 || strcmp($4,"LTE") == 0){
+            sprintf(Jcode_buf,"\tiflt LABEL_IF_FALSE_%d",if_stack[if_label_stack]);
+        }
+        else if( strcmp($4,"EQ") == 0 ){
+            sprintf(Jcode_buf,"\tifne LABEL_IF_FALSE_%d",if_stack[if_label_stack]);
+        }
+        else if( strcmp($4,"NE") == 0){
+            sprintf(Jcode_buf,"\tifeq LABEL_IF_FALSE_%d",if_stack[if_label_stack]);
+        }
+        writeCode(Jcode_buf);
 	}
-	|IF LB expression RB statement ELSE{} statement{
-		writeCode("test22");
+;
+selection_statement
+	:if_condition statement %prec THEN{
+        //不要if要去的地方
+        sprintf(Jcode_buf,"LABEL_IF_FALSE_%d:",if_stack[if_label_stack]);
+        writeCode(Jcode_buf);
+        //拔掉TOS
+        if_label_stack--;   
+	}
+	|if_condition  statement ELSE{
+		//if完要去的地方
+		sprintf(Jcode_buf,"goto LABEL_IF_EXIT_%d",if_stack[if_label_stack]);
+		writeCode(Jcode_buf);
+		//不是if要去的地方
+        sprintf(Jcode_buf,"LABEL_IF_FALSE_%d:",if_stack[if_label_stack]);
+        writeCode(Jcode_buf);
+	} statement{
+		//整個ifelse的出口
+        sprintf(Jcode_buf,"LABEL_IF_EXIT_%d:",if_stack[if_label_stack]);
+        writeCode(Jcode_buf);
+        //拔掉TOS
+		if_label_stack--;
+		
 	}
 ;
 iteration_statement/*while loop*/
 	:WHILE{
-		//產生label
-		sprintf(Jcode_buf,"LABEL_WHILE_BEGIN_%d:",while_label_num);
+		//label數++
+		while_label_num++;
+		//放到stack中
+		while_label_stack++;
+		while_stack[while_label_stack]=while_label_num;
+		sprintf(Jcode_buf,"LABEL_WHILE_BEGIN_%d:",while_stack[while_label_stack]);
 		writeCode(Jcode_buf);
 		//while判斷的開始
 		isWhile_flag = 1;
@@ -439,29 +491,29 @@ iteration_statement/*while loop*/
 		printf("compare:%s\n",$4);
 		//判斷是什麼compare，如果是錯的就跳轉
 		if( strcmp($4,"MT") == 0 || strcmp($4,"LT") == 0){
-			sprintf(Jcode_buf,"\tifle LABEL_WHILE_FALSE_%d",while_label_num);
+			sprintf(Jcode_buf,"\tifle LABEL_WHILE_FALSE_%d",while_stack[while_label_stack]);
 		}
 		else if( strcmp($4,"MTE") == 0 || strcmp($4,"LTE") == 0){
-            sprintf(Jcode_buf,"\tiflt LABEL_WHILE_FALSE_%d",while_label_num);
+            sprintf(Jcode_buf,"\tiflt LABEL_WHILE_FALSE_%d",while_stack[while_label_stack]);
         }
 		else if( strcmp($4,"EQ") == 0 ){
-            sprintf(Jcode_buf,"\tifne LABEL_WHILE_FALSE_%d",while_label_num);
+            sprintf(Jcode_buf,"\tifne LABEL_WHILE_FALSE_%d",while_stack[while_label_stack]);
         }
 		else if( strcmp($4,"NE") == 0){
-            sprintf(Jcode_buf,"\tifeq LABEL_WHILE_FALSE_%d",while_label_num);
+            sprintf(Jcode_buf,"\tifeq LABEL_WHILE_FALSE_%d",while_stack[while_label_stack]);
         }
 		writeCode(Jcode_buf);
 
 	}
 	statement{
 		//回去再判斷的地方
-		sprintf(Jcode_buf,"\tgoto LABEL_WHILE_BEGIN_%d",while_label_num);
+		sprintf(Jcode_buf,"\tgoto LABEL_WHILE_BEGIN_%d",while_stack[while_label_stack]);
 		writeCode(Jcode_buf);
 		//跳出loop要去的地方
-		sprintf(Jcode_buf,"LABEL_WHILE_FALSE_%d:",while_label_num);
+		sprintf(Jcode_buf,"LABEL_WHILE_FALSE_%d:",while_stack[while_label_stack]);
 		writeCode(Jcode_buf);
-		//label數+1
-		while_label_num++;
+		//取出TOS
+		while_label_stack--;
 	}
 ;
 expression_statement
@@ -502,6 +554,7 @@ declaration
 						writeCode(Jcode_buf);
 						if(global_float == 0){
 							Jinsert_zero($2,1);//發現宣告是0
+							printf("ddddd\n");
 						}
 						global_float = 0;
 					}
@@ -1187,6 +1240,17 @@ postfix_expression
 		//Jcode處理callfunction的部分
 		else{
 			lookfunction_att($1);//使用這個function搭配att_buf
+            //看這個function是什麼type
+            if(lookglobal_type($1) == 1){
+                $$ = "typeI";
+            }
+            else if(lookglobal_type($1) == 2){
+                exe_float_flag = 1;
+                $$ = "typeF";                                                                                                                                 
+            }
+            else if(lookglobal_type($1) == 5){
+                $$ = "typeV";
+            }			
 			sprintf(Jcode_buf,"\tinvokestatic compiler_hw3/%s(%s)",$1,att_buf);
 			//檢查argument和parameter有沒有一樣
 			printf("arg:%s\n",function_arg_type);
@@ -1216,6 +1280,42 @@ postfix_expression
             strcpy(message_buf,"Undeclared function ");
             strcat(message_buf,$1);
         }
+        //Jcode處理callfunction的部分
+        else{
+            lookfunction_att($1);//使用這個function搭配att_buf
+            sprintf(Jcode_buf,"\tinvokestatic compiler_hw3/%s(%s)",$1,att_buf);
+            //看這個function是什麼type
+            if(lookglobal_type($1) == 1){
+				$$ = "typeI";
+            }
+			else if(lookglobal_type($1) == 2){
+				exe_float_flag = 1;
+                $$ = "typeF";
+			}
+			else if(lookglobal_type($1) == 5){
+				$$ = "typeV";
+			}
+
+            //檢查argument和parameter有沒有一樣
+            printf("arg:%s\n",function_arg_type);
+            printf("att:%s\n",att_buf);
+            if( strcmp(function_arg_type,att_buf) != 0){
+                print_semantic_flag =1;
+                strcpy(message_buf,"函式輸入的argument與宣告的相比有誤");
+            }
+            strcpy(function_arg_type,"");//清空
+            strcpy(att_buf,"");//清空buf為了安全
+            if(lookglobal_type($1) == 1){
+                strcat(Jcode_buf,"I");
+            }
+            else if(lookglobal_type($1) == 2){
+                strcat(Jcode_buf,"F");
+            }
+            else if(lookglobal_type($1) == 5){
+                strcat(Jcode_buf,"V");
+            }
+            writeCode(Jcode_buf);
+        } 
 
 	}
 ;
@@ -1358,6 +1458,32 @@ primary_expression
                 }
             }
 		}
+		else if(isIf_flag == 1){
+			//輸入的是全域變數且這個ID並不是function
+            if(getStackindex($1) == -1 && lookup_global($1,"function") != 2){
+                sprintf(Jcode_buf,"\tgetstatic compiler_hw3/%s ",$1);
+                if(lookglobal_type($1) == 1){
+                    strcat(Jcode_buf,"I");
+                }
+                else if(lookglobal_type($1) ==2){
+                    strcat(Jcode_buf,"F");
+                    exe_float_flag = 1;//是float
+                }
+                writeCode(Jcode_buf);
+            }
+            else{
+                if(lookNglobal_type($1) == 1){
+                    printf("HI:%d\n",assign_right);
+                    sprintf(Jcode_buf,"\tiload %d",getStackindex($1));
+                    writeCode(Jcode_buf);
+                }
+                else if( lookNglobal_type($1) == 2){
+                    sprintf(Jcode_buf,"\tfload %d",getStackindex($1));
+                    writeCode(Jcode_buf);
+                    exe_float_flag = 1;//是float
+                }
+            }
+		}
 	
 	}
 	|constant{$$ = $1;}
@@ -1405,7 +1531,7 @@ constant
 		else{
 			$$ = "FCONST";
 		}
-		global_int = $1;
+		global_float = $1;
 		type_set.int_flag = 0;
 		type_set.float_flag = 1;
 		exe_float_flag = 1;//發現是float

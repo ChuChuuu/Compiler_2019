@@ -21,6 +21,10 @@ test:
 	@echo -e "\n\033[1;33mmain.class output\033[0m"
 	@java -jar jasmin.jar ${FNAME}.j
 	@java ${FNAME} 
-
+while:
+	@./${PARSER} < ./example_input/basic_while_statement.c
+	@echo -e "\n\033[1;33mmain.class output\033[0m"
+	@java -jar jasmin.jar ${FNAME}.j
+	@java ${FNAME}
 clean:
 	rm -f *.o ${PARSER} ${OBJECT} 
