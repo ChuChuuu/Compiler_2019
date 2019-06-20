@@ -1,215 +1,250 @@
 .class public compiler_hw3
 .super java/lang/Object
-.field public static A I = 0
-.field public static B I = 2
-.field public static D F = 2.000000
-.field public static H I = 1
-.field public static I I = 0
-.method public static foo1()I
+.field public static a I = 0
+.field public static b I = 10
+.field public static c F = 5.300000
+.method public static intfun(FI)I
 .limit stack 50
 .limit locals 50
-	ldc 2
-	ireturn
-.end method
-.method public static foo2()F
-.limit stack 50
-.limit locals 50
-	ldc 2.000000
-	freturn
-.end method
-.method public static main([Ljava/lang/String;)V
-.limit stack 50
-.limit locals 50
-	getstatic compiler_hw3/A I
+	ldc "cast float-int"
 	getstatic java/lang/System/out Ljava/io/PrintStream;
 	swap
-	invokevirtual java/io/PrintStream/println(I)V
-	getstatic compiler_hw3/B I
-	getstatic java/lang/System/out Ljava/io/PrintStream;
-	swap
-	invokevirtual java/io/PrintStream/println(I)V
-	getstatic compiler_hw3/D F
-	getstatic java/lang/System/out Ljava/io/PrintStream;
-	swap
-	invokevirtual java/io/PrintStream/println(F)V
-	ldc 0
-	istore 0
-	ldc 2
-	istore 1
-	ldc 2.000000
+	invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V
+	fload 0
 	f2i
 	istore 2
-	iload 0
+	iload 2
 	getstatic java/lang/System/out Ljava/io/PrintStream;
 	swap
 	invokevirtual java/io/PrintStream/println(I)V
+	ldc "test argument"
+	getstatic java/lang/System/out Ljava/io/PrintStream;
+	swap
+	invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V
 	iload 1
 	getstatic java/lang/System/out Ljava/io/PrintStream;
 	swap
 	invokevirtual java/io/PrintStream/println(I)V
 	iload 2
+	ireturn
+.end method
+.method public static floatfun(FI)F
+.limit stack 50
+.limit locals 50
+	ldc "cast int-float"
+	getstatic java/lang/System/out Ljava/io/PrintStream;
+	swap
+	invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V
+	iload 1
+	i2f
+	fstore 2
+	fload 2
+	getstatic java/lang/System/out Ljava/io/PrintStream;
+	swap
+	invokevirtual java/io/PrintStream/println(F)V
+	ldc "test argument"
+	getstatic java/lang/System/out Ljava/io/PrintStream;
+	swap
+	invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V
+	fload 0
+	getstatic java/lang/System/out Ljava/io/PrintStream;
+	swap
+	invokevirtual java/io/PrintStream/println(F)V
+	fload 2
+	freturn
+.end method
+.method public static main([Ljava/lang/String;)V
+.limit stack 50
+.limit locals 50
+	ldc "1.will a = 0"
+	getstatic java/lang/System/out Ljava/io/PrintStream;
+	swap
+	invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V
+	getstatic compiler_hw3/a I
 	getstatic java/lang/System/out Ljava/io/PrintStream;
 	swap
 	invokevirtual java/io/PrintStream/println(I)V
-	ldc 0
-	i2f
-	fstore 3
+	ldc "2.will b = 10"
+	getstatic java/lang/System/out Ljava/io/PrintStream;
+	swap
+	invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V
+	getstatic compiler_hw3/b I
+	getstatic java/lang/System/out Ljava/io/PrintStream;
+	swap
+	invokevirtual java/io/PrintStream/println(I)V
+	ldc "3.will c = 5.3"
+	getstatic java/lang/System/out Ljava/io/PrintStream;
+	swap
+	invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V
+	getstatic compiler_hw3/c F
+	getstatic java/lang/System/out Ljava/io/PrintStream;
+	swap
+	invokevirtual java/io/PrintStream/println(F)V
+	ldc 1
+	istore 0
+	ldc "4.will a = 1"
+	getstatic java/lang/System/out Ljava/io/PrintStream;
+	swap
+	invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V
+	iload 0
+	getstatic java/lang/System/out Ljava/io/PrintStream;
+	swap
+	invokevirtual java/io/PrintStream/println(I)V
 	ldc 2
-	i2f
-	fstore 4
-	ldc 2.000000
-	fstore 5
-	fload 3
+	istore 1
+	ldc 3
+	istore 2
+	ldc "5.will d = 3"
 	getstatic java/lang/System/out Ljava/io/PrintStream;
 	swap
-	invokevirtual java/io/PrintStream/println(F)V
-	fload 4
+	invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V
+	iload 2
 	getstatic java/lang/System/out Ljava/io/PrintStream;
 	swap
-	invokevirtual java/io/PrintStream/println(F)V
-	fload 5
+	invokevirtual java/io/PrintStream/println(I)V
+	ldc "6.will d = 2"
 	getstatic java/lang/System/out Ljava/io/PrintStream;
 	swap
-	invokevirtual java/io/PrintStream/println(F)V
-	ldc "test"
-	astore 6
-	aload 6
+	invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V
+	iload 1
+	getstatic java/lang/System/out Ljava/io/PrintStream;
+	swap
+	invokevirtual java/io/PrintStream/println(I)V
+	ldc 3.200000
+	fstore 2
+	ldc "test string,1,2.2,gb=10,gc=5.3,e=3.2"
 	getstatic java/lang/System/out Ljava/io/PrintStream;
 	swap
 	invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V
 	ldc 1
-	istore 7
+	getstatic java/lang/System/out Ljava/io/PrintStream;
+	swap
+	invokevirtual java/io/PrintStream/println(I)V
+	ldc 2.200000
+	getstatic java/lang/System/out Ljava/io/PrintStream;
+	swap
+	invokevirtual java/io/PrintStream/println(F)V
+	getstatic compiler_hw3/b I
+	getstatic java/lang/System/out Ljava/io/PrintStream;
+	swap
+	invokevirtual java/io/PrintStream/println(I)V
+	getstatic compiler_hw3/c F
+	getstatic java/lang/System/out Ljava/io/PrintStream;
+	swap
+	invokevirtual java/io/PrintStream/println(F)V
+	fload 2
+	getstatic java/lang/System/out Ljava/io/PrintStream;
+	swap
+	invokevirtual java/io/PrintStream/println(F)V
 	ldc 0
-	istore 8
+	istore 3
+	ldc 0.000000
+	fstore 4
+	iload 3
 	ldc 1
-	iload 0
 	iadd
-	istore 9
+	istore 3
+	ldc "7.++ f = 1"
+	getstatic java/lang/System/out Ljava/io/PrintStream;
+	swap
+	invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V
+	iload 3
+	getstatic java/lang/System/out Ljava/io/PrintStream;
+	swap
+	invokevirtual java/io/PrintStream/println(I)V
+	iload 3
 	ldc 1
-	fload 3
+	isub
+	istore 3
+	ldc "8.-- f = 0"
+	getstatic java/lang/System/out Ljava/io/PrintStream;
 	swap
-	i2f
+	invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V
+	iload 3
+	getstatic java/lang/System/out Ljava/io/PrintStream;
 	swap
-	fadd
+	invokevirtual java/io/PrintStream/println(I)V
+	ldc "do function float"
+	getstatic java/lang/System/out Ljava/io/PrintStream;
+	swap
+	invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V
+	ldc 5.200000
+	ldc 3
+	invokestatic compiler_hw3/floatfun(FI)F
 	f2i
-	istore 10
-	iload 1
-	ldc 2.000000
+	istore 3
+	ldc "do function int"
+	getstatic java/lang/System/out Ljava/io/PrintStream;
 	swap
+	invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V
+	ldc 1.200000
+	ldc 3
+	invokestatic compiler_hw3/intfun(FI)I
 	i2f
+	fstore 4
+	iload 3
+	getstatic java/lang/System/out Ljava/io/PrintStream;
 	swap
-	fadd
-	f2i
-	istore 11
+	invokevirtual java/io/PrintStream/println(I)V
 	fload 4
-	ldc 2.000000
-	fadd
-	f2i
-	istore 12
-	iload 9
+	getstatic java/lang/System/out Ljava/io/PrintStream;
+	swap
+	invokevirtual java/io/PrintStream/println(F)V
+	ldc 1.200000
+	ldc 3
+	invokestatic compiler_hw3/intfun(FI)I
+	istore 3
+	ldc 5.200000
+	ldc 3
+	invokestatic compiler_hw3/floatfun(FI)F
+	fstore 4
+	ldc "-------"
+	getstatic java/lang/System/out Ljava/io/PrintStream;
+	swap
+	invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V
+	iload 3
 	getstatic java/lang/System/out Ljava/io/PrintStream;
 	swap
 	invokevirtual java/io/PrintStream/println(I)V
-	iload 10
-	getstatic java/lang/System/out Ljava/io/PrintStream;
-	swap
-	invokevirtual java/io/PrintStream/println(I)V
-	iload 11
-	getstatic java/lang/System/out Ljava/io/PrintStream;
-	swap
-	invokevirtual java/io/PrintStream/println(I)V
-	iload 12
-	getstatic java/lang/System/out Ljava/io/PrintStream;
-	swap
-	invokevirtual java/io/PrintStream/println(I)V
-	invokestatic compiler_hw3/foo1()I
-	istore 13
-	ldc 1
-	invokestatic compiler_hw3/foo1()I
-	iadd
-	istore 14
-	invokestatic compiler_hw3/foo1()I
-	ldc 1.000000
-	swap
-	i2f
-	swap
-	fsub
-	f2i
-	istore 15
-	iload 13
-	getstatic java/lang/System/out Ljava/io/PrintStream;
-	swap
-	invokevirtual java/io/PrintStream/println(I)V
-	iload 14
-	getstatic java/lang/System/out Ljava/io/PrintStream;
-	swap
-	invokevirtual java/io/PrintStream/println(I)V
-	iload 15
-	getstatic java/lang/System/out Ljava/io/PrintStream;
-	swap
-	invokevirtual java/io/PrintStream/println(I)V
-	ldc 1.000000
-	fload 3
-	fadd
-	fstore 16
-	ldc 1.000000
-	iload 0
-	i2f
-	fadd
-	fstore 17
 	fload 4
-	ldc 1
+	getstatic java/lang/System/out Ljava/io/PrintStream;
+	swap
+	invokevirtual java/io/PrintStream/println(F)V
+	ldc 5.300000
+	ldc 3
+	invokestatic compiler_hw3/floatfun(FI)F
+	fstore 5
+	ldc "-------"
+	getstatic java/lang/System/out Ljava/io/PrintStream;
+	swap
+	invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V
+	fload 5
+	getstatic java/lang/System/out Ljava/io/PrintStream;
+	swap
+	invokevirtual java/io/PrintStream/println(F)V
+	ldc "------"
+	getstatic java/lang/System/out Ljava/io/PrintStream;
+	swap
+	invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V
+	ldc 48
+	istore 6
+	ldc 50
+	fload 4
+	swap
 	i2f
-	fadd
-	fstore 18
-	iload 1
-	ldc 1
-	iadd
+	swap
+	fdiv
+	iload 6
+	swap
+	swap
 	i2f
-	fstore 19
-	fload 16
+	swap
+	fdiv
+	f2i
+	istore 6
+	iload 6
 	getstatic java/lang/System/out Ljava/io/PrintStream;
 	swap
-	invokevirtual java/io/PrintStream/println(F)V
-	fload 17
-	getstatic java/lang/System/out Ljava/io/PrintStream;
-	swap
-	invokevirtual java/io/PrintStream/println(F)V
-	fload 18
-	getstatic java/lang/System/out Ljava/io/PrintStream;
-	swap
-	invokevirtual java/io/PrintStream/println(F)V
-	fload 19
-	getstatic java/lang/System/out Ljava/io/PrintStream;
-	swap
-	invokevirtual java/io/PrintStream/println(F)V
-	invokestatic compiler_hw3/foo2()F
-	fstore 20
-	ldc 1.000000
-	invokestatic compiler_hw3/foo2()F
-	fadd
-	fstore 21
-	invokestatic compiler_hw3/foo2()F
-	ldc 1
-	i2f
-	fsub
-	fstore 22
-	invokestatic compiler_hw3/foo2()F
-	fload 20
-	swap
-	fadd
-	fstore 20
-	fload 20
-	getstatic java/lang/System/out Ljava/io/PrintStream;
-	swap
-	invokevirtual java/io/PrintStream/println(F)V
-	fload 21
-	getstatic java/lang/System/out Ljava/io/PrintStream;
-	swap
-	invokevirtual java/io/PrintStream/println(F)V
-	fload 22
-	getstatic java/lang/System/out Ljava/io/PrintStream;
-	swap
-	invokevirtual java/io/PrintStream/println(F)V
+	invokevirtual java/io/PrintStream/println(I)V
 	return
 .end method

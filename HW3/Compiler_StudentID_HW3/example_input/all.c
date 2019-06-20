@@ -67,10 +67,8 @@ void main(){
 	print("-------");
 	print(f);
 	print(g);
-	int h = intfun(1.2,3);
 	float i = floatfun(5.3,3);
 	print("-------");
-	print(h);
 	print(i);
 	print("------");
 	//divide by zero

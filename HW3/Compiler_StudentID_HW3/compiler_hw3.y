@@ -1360,7 +1360,9 @@ primary_expression
 		//不是在等於的右邊就不用load
 		if(assign_right == 1){
 			//輸入的是全域變數且這個ID並不是function
+			printf("get:%d,up:%d,",getStackindex($1),lookup_global($1,"function"));
 			if(getStackindex($1) == -1 && lookup_global($1,"function") != 2){
+				printf("dddd\n");
 				sprintf(Jcode_buf,"\tgetstatic compiler_hw3/%s ",$1);
 				if(lookglobal_type($1) == 1){
 					strcat(Jcode_buf,"I");
@@ -1371,7 +1373,9 @@ primary_expression
 				}
 				writeCode(Jcode_buf);
 			}
-			else{
+			//輸入的不是全域變數（就不會有function存在）
+			else if(getStackindex($1) != -1){
+				printf("eeee\n");
 				if(lookNglobal_type($1) == 1){
 					sprintf(Jcode_buf,"\tiload %d",getStackindex($1));
 					writeCode(Jcode_buf);
@@ -1850,7 +1854,7 @@ int lookNglobal_type(char* var_name){
     int i;
     int type = -1;//1 is int,2 is float，-1 is not find
     Node* tempnode;
-    tempnode = First->next;
+    tempnode = First;
 	if( strcmp(var_name,"ICONST") == 0 || strcmp(var_name,"typeI") == 0 || strcmp(var_name,"IZERO") == 0){
 		return 1;
 	}

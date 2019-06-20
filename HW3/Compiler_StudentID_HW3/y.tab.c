@@ -660,9 +660,9 @@ static const yytype_uint16 yyrline[] =
      751,   752,   752,   866,   867,   868,   869,   870,   871,   874,
      875,   884,   894,   901,   910,   917,   926,   927,   966,  1008,
     1009,  1050,  1074,  1087,  1088,  1089,  1090,  1117,  1120,  1128,
-    1129,  1183,  1237,  1237,  1281,  1328,  1340,  1352,  1494,  1495,
-    1496,  1499,  1506,  1515,  1531,  1550,  1560,  1561,  1562,  1563,
-    1564
+    1129,  1183,  1237,  1237,  1281,  1328,  1340,  1352,  1498,  1499,
+    1500,  1503,  1510,  1519,  1535,  1554,  1564,  1565,  1566,  1567,
+    1568
 };
 #endif
 
@@ -3081,7 +3081,9 @@ yyreduce:
 		//不是在等於的右邊就不用load
 		if(assign_right == 1){
 			//輸入的是全域變數且這個ID並不是function
+			printf("get:%d,up:%d,",getStackindex((yyvsp[(1) - (1)].id_val)),lookup_global((yyvsp[(1) - (1)].id_val),"function"));
 			if(getStackindex((yyvsp[(1) - (1)].id_val)) == -1 && lookup_global((yyvsp[(1) - (1)].id_val),"function") != 2){
+				printf("dddd\n");
 				sprintf(Jcode_buf,"\tgetstatic compiler_hw3/%s ",(yyvsp[(1) - (1)].id_val));
 				if(lookglobal_type((yyvsp[(1) - (1)].id_val)) == 1){
 					strcat(Jcode_buf,"I");
@@ -3092,7 +3094,9 @@ yyreduce:
 				}
 				writeCode(Jcode_buf);
 			}
-			else{
+			//輸入的不是全域變數（就不會有function存在）
+			else if(getStackindex((yyvsp[(1) - (1)].id_val)) != -1){
+				printf("eeee\n");
 				if(lookNglobal_type((yyvsp[(1) - (1)].id_val)) == 1){
 					sprintf(Jcode_buf,"\tiload %d",getStackindex((yyvsp[(1) - (1)].id_val)));
 					writeCode(Jcode_buf);
@@ -3215,12 +3219,12 @@ yyreduce:
     break;
 
   case 98:
-#line 1494 "compiler_hw3.y"
+#line 1498 "compiler_hw3.y"
     {(yyval.id_val) = (yyvsp[(1) - (1)].id_val);}
     break;
 
   case 101:
-#line 1499 "compiler_hw3.y"
+#line 1503 "compiler_hw3.y"
     {
 		global_bool = 1;
 		if(scope_flag > 0){
@@ -3231,7 +3235,7 @@ yyreduce:
     break;
 
   case 102:
-#line 1506 "compiler_hw3.y"
+#line 1510 "compiler_hw3.y"
     {
 		global_bool = 0;
 		if(scope_flag > 0){
@@ -3242,7 +3246,7 @@ yyreduce:
     break;
 
   case 103:
-#line 1515 "compiler_hw3.y"
+#line 1519 "compiler_hw3.y"
     {
 		//要看這個常數是不是0
 		if( (yyvsp[(1) - (1)].i_val) == 0 ){
@@ -3262,7 +3266,7 @@ yyreduce:
     break;
 
   case 104:
-#line 1531 "compiler_hw3.y"
+#line 1535 "compiler_hw3.y"
     {
 		//要看這個常數是不是0
 		if( (yyvsp[(1) - (1)].f_val) == 0){
@@ -3283,7 +3287,7 @@ yyreduce:
     break;
 
   case 105:
-#line 1550 "compiler_hw3.y"
+#line 1554 "compiler_hw3.y"
     {
 		(yyval.id_val) = "STRCONST";
 		sprintf(global_string,"%s",(yyvsp[(1) - (1)].string_val));
@@ -3295,33 +3299,33 @@ yyreduce:
     break;
 
   case 106:
-#line 1560 "compiler_hw3.y"
+#line 1564 "compiler_hw3.y"
     { (yyval.type_val) = (yyvsp[(1) - (1)].type_val);}
     break;
 
   case 107:
-#line 1561 "compiler_hw3.y"
+#line 1565 "compiler_hw3.y"
     { (yyval.type_val) = (yyvsp[(1) - (1)].type_val); }
     break;
 
   case 108:
-#line 1562 "compiler_hw3.y"
+#line 1566 "compiler_hw3.y"
     { (yyval.type_val) = (yyvsp[(1) - (1)].type_val); }
     break;
 
   case 109:
-#line 1563 "compiler_hw3.y"
+#line 1567 "compiler_hw3.y"
     { (yyval.type_val) = (yyvsp[(1) - (1)].type_val); }
     break;
 
   case 110:
-#line 1564 "compiler_hw3.y"
+#line 1568 "compiler_hw3.y"
     { (yyval.type_val) = (yyvsp[(1) - (1)].type_val); }
     break;
 
 
 /* Line 1267 of yacc.c.  */
-#line 3325 "y.tab.c"
+#line 3329 "y.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -3535,7 +3539,7 @@ yyreturn:
 }
 
 
-#line 1566 "compiler_hw3.y"
+#line 1570 "compiler_hw3.y"
 
 
 /* C code section */
@@ -3823,7 +3827,7 @@ int lookNglobal_type(char* var_name){
     int i;
     int type = -1;//1 is int,2 is float，-1 is not find
     Node* tempnode;
-    tempnode = First->next;
+    tempnode = First;
 	if( strcmp(var_name,"ICONST") == 0 || strcmp(var_name,"typeI") == 0 || strcmp(var_name,"IZERO") == 0){
 		return 1;
 	}
