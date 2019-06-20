@@ -40,7 +40,8 @@ int while_stack[50];//label的stack
 int if_label_num;//用來記住if用的label
 int if_label_stack;//用來記現在在哪個stack
 int if_stack[50];//用來記住if用的label
-char init_declarator_buf[20];//給init_declarator往上面傳 
+char init_declarator_buf[20];//給init_declarator往上面傳
+int remove_flag=0;//刪除檔案
 /* Symbol table function - you can add new function if needed. */
 int lookup_symbol(char* name,char* kind);
 int lookup_global(char* name,char* kind);
@@ -189,7 +190,6 @@ function_definition
 		else{
 			strcat(Jcode_buf,function_pra_type);
 			strcat(Jcode_buf,")");
-			printf("uptype:%s\n",function_pra_type);
 
 		}
 		//Jcode去加上function的type
@@ -358,7 +358,6 @@ print_content
 			}
 			//是global
 			else if( getStackindex($1) == -1){
-				printf("look:%d\n",lookglobal_type($1));
 				//是int
 				if(lookglobal_type($1) == 1){
 					sprintf(Jcode_buf,"\tgetstatic compiler_hw3/%s I",$1);
@@ -408,7 +407,6 @@ jump_statement
 	|RET{isReturn_flag = 1;} expression SEMICOLON{
 		exe_float_flag = 0;
 		isReturn_flag = 0;//return的flag要歸回
-		printf("return:%s\n",$3);
 		//如果reutrn的type與function有一致
 //c		if(look_function_type_flag == lookglobal_type($3) || look_function_type_flag == lookNglobal_type($3)){
 		if(look_function_type_flag == lookNglobal_type($3) ){
@@ -439,7 +437,6 @@ if_condition
 		if_label_stack++;
 		//放進stack
 		if_stack[if_label_stack] = if_label_num;
-        printf("compare:%s\n",$4);
         //判斷是什麼compare，如果是錯的就跳轉
         if( strcmp($4,"MT") == 0 || strcmp($4,"LT") == 0 || lookNglobal_type($4) == 4){
             sprintf(Jcode_buf,"\tifle LABEL_IF_FALSE_%d",if_stack[if_label_stack]);
@@ -494,7 +491,6 @@ iteration_statement/*while loop*/
 	}
 	LB expression RB{
 		isWhile_flag = 0;//while判斷的結束
-		printf("compare:%s\n",$4);
 		//判斷是什麼compare，如果是錯的就跳轉
 		if( strcmp($4,"MT") == 0 || strcmp($4,"LT") == 0 || lookNglobal_type($4)==4 ){
 			sprintf(Jcode_buf,"\tifle LABEL_WHILE_FALSE_%d",while_stack[while_label_stack]);
@@ -533,7 +529,6 @@ expression/*situation like a = 10 , b=20;*/
 
 declaration
 	:type_specifier init_declarator SEMICOLON{
-//好像用不到		isFun_flag = 0;//用來看declare是不是function的flag結束
 		if(func_declare_flag == 1){
 			func_declare_flag = 0;
 			scope_flag--;
@@ -551,7 +546,6 @@ declaration
 			}
 		}
 		else{
-			printf("thisbuf:%s\n",init_declarator_buf);
 			if(lookup_symbol($2,"variable") == 0&&lookup_symbol($2,"parameter") == 0&&lookup_symbol($2,"function") == 0&&lookup_global($2,"function")==0){
 				insert_symbol($2,$1,"variable","");
 				De_ASGNfunction($1,$2,init_declarator_buf);
@@ -661,7 +655,6 @@ init_declarator
 		$$=$1;
 		strcpy(init_declarator_buf,$4);//把initializer上傳
 		assign_right = 0;//“=”右邊使用結束
-		printf("itype:%s\n",$4);
 		if(strcmp($4,"IZERO") == 0 || strcmp($4,"FZERO") == 0){
 			declare_zero = 1;
 		}
@@ -688,8 +681,8 @@ direct_declarator
 	:ID{	
 		$$=$1;
 	}
-	|direct_declarator LB{printf("111\n");func_declare_flag = 1;scope_flag++;create_symbol(scope_flag);} RB
-	|direct_declarator LB{printf("333\n");func_declare_flag = 1;scope_flag++;create_symbol(scope_flag);} parameter_type_list RB
+	|direct_declarator LB{func_declare_flag = 1;scope_flag++;create_symbol(scope_flag);} RB
+	|direct_declarator LB{func_declare_flag = 1;scope_flag++;create_symbol(scope_flag);} parameter_type_list RB
 	|direct_declarator LB identifier_list RB/*ex. int a = f(5);*///好像沒用到
 ;
 identifier_list
@@ -703,7 +696,6 @@ parameter_list
 	:parameter_declaration{
 		strcpy(attribute_buf,$1);
 		strcat(attribute_buf,"\0");
-		printf("type:%si\n",$1);
 		//Jcode用的type
 		if( strcmp($1,"int") == 0){
 			strcpy(function_pra_type,"I");
@@ -719,7 +711,6 @@ parameter_list
 		strcat(attribute_buf,", ");
 		strcat(attribute_buf,$3);
 		strcat(attribute_buf,"\0");
-		printf("type:%si\n",$3);
 		//Jcode用的type
 		if( strcmp($3,"int") == 0){
             strcat(function_pra_type,"I");
@@ -843,7 +834,6 @@ assignment_expression
 */		}
 		//是“+=”
 		else if($2 == 2){
-			printf("test:%s\n",$4);
 			ADDASGNfunction($1,$4);
 		}
 		//是“-=”
@@ -1019,8 +1009,6 @@ multiplicative_expression
 	|multiplicative_expression MUL unary_expression{
 		//處理cast的問題
         //兩個都是int
-        printf("%s %s\n",$1,$3);
-        printf("%d \n",lookNglobal_type($1));
 //c     if( (lookglobal_type($1) == 1 || lookNglobal_type($1) == 1) && (lookglobal_type($3) == 1 || lookNglobal_type($3) == 1) ){
         if ( (lookNglobal_type($1) == 1) && (lookNglobal_type($3) == 1)){ 
             sprintf(Jcode_buf,"\timul");
@@ -1066,8 +1054,6 @@ multiplicative_expression
 		DIVfunction($1,$3);
 		//處理cast的問題
         //兩個都是int
-        printf("%s %s\n",$1,$3);
-        printf("%d \n",lookNglobal_type($1));
 //c     if( (lookglobal_type($1) == 1 || lookNglobal_type($1) == 1) && (lookglobal_type($3) == 1 || lookNglobal_type($3) == 1) ){
         if ( (lookNglobal_type($1) == 1) && (lookNglobal_type($3) == 1)){ 		
             $$ = "typeI";
@@ -1091,8 +1077,6 @@ multiplicative_expression
 	}
 	|multiplicative_expression MOD unary_expression{
         //沒有cast的問題
-        printf("%s %s\n",$1,$3);
-        printf("%d \n",lookNglobal_type($1));
 		//MOD的function
 		MODfunction($1,$3);
 		//兩個都是INT
@@ -1233,7 +1217,7 @@ postfix_expression
             }
             writeCode(Jcode_buf);
         }
-        //++的型態是float
+        //--的型態是float
 //c     else if(lookNglobal_type($1) == 2 || lookglobal_type($1) == 2){
 		else if( lookNglobal_type($1) == 2){ 
 			$$ = "typeF";
@@ -1288,8 +1272,6 @@ postfix_expression
             }			
 			sprintf(Jcode_buf,"\tinvokestatic compiler_hw3/%s(%s)",$1,att_buf);
 			//檢查argument和parameter有沒有一樣
-			printf("arg:%s\n",function_arg_type);
-			printf("att:%s\n",att_buf);
 			if( strcmp(function_arg_type,att_buf) != 0){
 				print_semantic_flag =1;
 				strcpy(message_buf,"函式輸入的argument與宣告的相比有誤");
@@ -1338,8 +1320,6 @@ postfix_expression
 			}
 
             //檢查argument和parameter有沒有一樣
-            printf("arg:%s\n",function_arg_type);
-            printf("att:%s\n",att_buf);
             if( strcmp(function_arg_type,att_buf) != 0){
                 print_semantic_flag =1;
                 strcpy(message_buf,"函式輸入的argument與宣告的相比有誤");
@@ -1366,7 +1346,6 @@ postfix_expression
 argument_expression_list
 	:assignment_expression{
 		//用來紀錄輸入了哪些argument
-		printf("::%s\n",$1);
 //c		if(lookglobal_type($1) == 1 || lookNglobal_type($1) == 1){
 		if( lookNglobal_type($1) == 1){ 
 			strcat(function_arg_type,"I");
@@ -1382,7 +1361,6 @@ argument_expression_list
 	}
 	|argument_expression_list COMMA assignment_expression{
 		 //用來紀錄輸入了哪些argument
-        printf("::%s\n",$3);
 //c     if(lookglobal_type($3) == 1 || lookNglobal_type($3) == 1){
 		if( lookNglobal_type($3) == 1){ 
             strcat(function_arg_type,"I");
@@ -1408,9 +1386,7 @@ primary_expression
 		//不是在等於的右邊就不用load
 		if(assign_right == 1){
 			//輸入的是全域變數且這個ID並不是function
-			printf("get:%d,up:%d,",getStackindex($1),lookup_global($1,"function"));
 			if(getStackindex($1) == -1 && lookup_global($1,"function") != 2){
-				printf("dddd\n");
 				sprintf(Jcode_buf,"\tgetstatic compiler_hw3/%s ",$1);
 //d				if(lookglobal_type($1) == 1){
 				if( lookNglobal_type($1) == 1){ 
@@ -1431,7 +1407,6 @@ primary_expression
 			}
 			//輸入的不是全域變數（就不會有function存在）
 			else if(getStackindex($1) != -1){
-				printf("eeee\n");
 				if(lookNglobal_type($1) == 1){
 					sprintf(Jcode_buf,"\tiload %d",getStackindex($1));
 					writeCode(Jcode_buf);
@@ -1561,7 +1536,6 @@ primary_expression
             }
             else if(getStackindex($1) != -1){
                 if(lookNglobal_type($1) == 1){
-                    printf("HI:%d\n",assign_right);
                     sprintf(Jcode_buf,"\tiload %d",getStackindex($1));
                     writeCode(Jcode_buf);
                 }
@@ -1603,7 +1577,6 @@ primary_expression
             }
             else if(getStackindex($1) != -1){
                 if(lookNglobal_type($1) == 1){
-                    printf("HI:%d\n",assign_right);
                     sprintf(Jcode_buf,"\tiload %d",getStackindex($1));
                     writeCode(Jcode_buf);
                 }
@@ -1721,12 +1694,21 @@ int main(int argc, char** argv)
 		error_flag = 0;
 		printf("\nTotal lines: %d \n",yylineno);
 	}
+	if(remove_flag == 1){
+		if(remove("compiler_hw3.j")==0){
+			printf("remove success\n");
+		}
+		else{
+			printf("remove fail\n");
+		}
+	}
 
     return 0;
 }
 
 void yyerror(char *s)
 {
+	remove_flag = 1;
 	error_flag = 1;
 	printf("%d: %s\n",yylineno+1,buf);  
 	if( print_semantic_flag == 1){
@@ -1743,6 +1725,7 @@ void yyerror(char *s)
 	strcpy(buf,"");
 }
 void se_error(char *s){
+	remove_flag = 1;
 	printf("%d: %s\n",yylineno,buf);
     printf("\n|-----------------------------------------------|\n");
     printf("| Error found in line %d: %s\n", yylineno, buf);
@@ -2032,7 +2015,6 @@ void lookfunction_att(char* fun_name){
     for(i = 0 ; i < tempnode->var_index ; i++){
         if(strcmp(fun_name,tempnode->STable[i].name)==0){
 			strcpy(Jatt,tempnode->STable[i].Jatt);
-			printf("Jatt:%s\n",tempnode->STable[i].Jatt);
         }
     }
 	strcpy(att_buf,Jatt);
@@ -2630,7 +2612,6 @@ void RE_cha_function(char* left,char* right){
 void De_ASGNfunction(char* left,char* var_name , char* right){
 	char* name;
 	name = strdup(var_name);
-	printf("infun:%s\n",name);
 	if(scope_flag == 0){
 		if( strcmp(left,"float") == 0){
 			sprintf(Jcode_buf,".field public static %s F = %f",name,global_float);
@@ -2658,7 +2639,6 @@ void De_ASGNfunction(char* left,char* var_name , char* right){
 	//宣告的地方不是global的
 	else{
 		//如果後面沒有float
-		printf("aaaaa:%d,%d\n",lookglobal_type(right),lookNglobal_type(right));
 		//如果沒有初始化
 		if( noinitial_flag == 1){
 			sprintf(Jcode_buf,"\tldc 0");

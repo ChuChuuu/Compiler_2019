@@ -27,7 +27,7 @@ while:
 	@java -jar jasmin.jar ${FNAME}.j
 	@java ${FNAME}
 declare:
-	@./${PARSER} < ./example_input/declaration.c
+	@./${PARSER} < ./example_input/basic_declaration.c
 	@echo -e "\n\033[1;33mmain.class output\033[0m"
 	@java -jar jasmin.jar ${FNAME}.j
 	@java ${FNAME}
@@ -38,7 +38,7 @@ function:
 	@java ${FNAME}
 
 alltest:
-	@./${PARSER} < ./example_input/all.c
+	@./${PARSER} < ./example_input/error.c
 	@echo -e "\n\033[1;33mmain.class output\033[0m"
 	@java -jar jasmin.jar ${FNAME}.j
 	@java ${FNAME}

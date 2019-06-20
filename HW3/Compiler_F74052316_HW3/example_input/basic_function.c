@@ -14,10 +14,8 @@ void main(){
    int d=6;
    float dd;
    int b;
-   b = c>d;
 
-   print(b);
-   a = foo(4)+5;
+   a = foo(4);
    lol(a);
    return;
 }
