@@ -1,6 +1,11 @@
 int a;
 int b=10;
 float c = 5.3;
+void printstring(){
+	string p = "AA";
+	print(p);
+	return;
+}
 int intfun(float a,int c){
 	print("cast float-int");
 	int b = a;//test casting
@@ -75,6 +80,13 @@ void main(){
 	int j = 48;
 	j /= 50/g;
 	print(j);
-	
+	printstring();
+	bool BOOL = false;
+	if(BOOL){
+		print("ture");
+	}
+	else{
+		print("false");
+	}
 return;
 }

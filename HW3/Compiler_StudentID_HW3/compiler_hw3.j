@@ -3,6 +3,17 @@
 .field public static a I = 0
 .field public static b I = 10
 .field public static c F = 5.300000
+.method public static printstring()V
+.limit stack 50
+.limit locals 50
+	ldc "AA"
+	astore 0
+	aload 0
+	getstatic java/lang/System/out Ljava/io/PrintStream;
+	swap
+	invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V
+	return
+.end method
 .method public static intfun(FI)I
 .limit stack 50
 .limit locals 50
@@ -246,5 +257,21 @@
 	getstatic java/lang/System/out Ljava/io/PrintStream;
 	swap
 	invokevirtual java/io/PrintStream/println(I)V
+	invokestatic compiler_hw3/printstring()V
+	ldc 0
+	istore 7
+	iload 7
+	ifle LABEL_IF_FALSE_1
+	ldc "ture"
+	getstatic java/lang/System/out Ljava/io/PrintStream;
+	swap
+	invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V
+goto LABEL_IF_EXIT_1
+LABEL_IF_FALSE_1:
+	ldc "false"
+	getstatic java/lang/System/out Ljava/io/PrintStream;
+	swap
+	invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V
+LABEL_IF_EXIT_1:
 	return
 .end method
