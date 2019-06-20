@@ -212,6 +212,7 @@ int while_stack[50];//label的stack
 int if_label_num;//用來記住if用的label
 int if_label_stack;//用來記現在在哪個stack
 int if_stack[50];//用來記住if用的label
+char init_declarator_buf[20];//給init_declarator往上面傳 
 /* Symbol table function - you can add new function if needed. */
 int lookup_symbol(char* name,char* kind);
 int lookup_global(char* name,char* kind);
@@ -240,11 +241,13 @@ void SUBfunction(char* left,char* right);//用來做sub的運算
 void MULfunction(char* left,char* right);//用來做mul的運算
 void MODfunction(char* left,char* right);//用來做mod的運算
 void DIVfunction(char* left,char* right);//用來做div的運算
+void ASGNfunction(char* left, char* right);
 void ADDASGNfunction(char* left ,char* right);
 void SUBASGNfunction(char* left ,char* right);
 void MULASGNfunction(char* left ,char* right);
 void MODASGNfunction(char* left ,char* right);
 void DIVASGNfunction(char* left ,char* right);
+void De_ASGNfunction(char* left ,char* var_name,char* right);
 /*some variable*/
 typedef struct {
 	int int_flag;
@@ -298,7 +301,7 @@ FILE *file;//to generate .j file for jasmin
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 112 "compiler_hw3.y"
+#line 115 "compiler_hw3.y"
 {
     int i_val;
     double f_val;
@@ -308,7 +311,7 @@ typedef union YYSTYPE
 	int assign_flag;
 }
 /* Line 193 of yacc.c.  */
-#line 312 "y.tab.c"
+#line 315 "y.tab.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -321,7 +324,7 @@ typedef union YYSTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 325 "y.tab.c"
+#line 328 "y.tab.c"
 
 #ifdef short
 # undef short
@@ -648,18 +651,18 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,   172,   172,   173,   176,   177,   180,   180,   245,   245,
-     257,   257,   272,   273,   276,   277,   280,   281,   282,   283,
-     284,   285,   288,   291,   299,   307,   315,   390,   403,   403,
-     429,   429,   454,   461,   461,   478,   489,   478,   520,   521,
-     524,   525,   529,   654,   654,   666,   682,   685,   688,   688,
-     689,   689,   690,   693,   694,   697,   700,   714,   732,   745,
-     748,   749,   749,   861,   862,   863,   864,   865,   866,   869,
-     870,   879,   889,   896,   905,   912,   921,   922,   961,  1003,
-    1004,  1045,  1069,  1082,  1083,  1084,  1085,  1112,  1115,  1123,
-    1124,  1178,  1232,  1232,  1276,  1323,  1335,  1347,  1489,  1490,
-    1491,  1494,  1501,  1510,  1526,  1545,  1555,  1556,  1557,  1558,
-    1559
+       0,   175,   175,   176,   179,   180,   183,   183,   249,   249,
+     261,   261,   276,   277,   280,   281,   284,   285,   286,   287,
+     288,   289,   292,   295,   303,   311,   319,   394,   407,   407,
+     433,   433,   458,   465,   465,   482,   493,   482,   524,   525,
+     528,   529,   533,   654,   654,   667,   683,   686,   689,   689,
+     690,   690,   691,   694,   695,   698,   701,   716,   735,   748,
+     751,   752,   752,   866,   867,   868,   869,   870,   871,   874,
+     875,   884,   894,   901,   910,   917,   926,   927,   966,  1008,
+    1009,  1050,  1074,  1087,  1088,  1089,  1090,  1117,  1120,  1128,
+    1129,  1183,  1237,  1237,  1281,  1328,  1340,  1352,  1494,  1495,
+    1496,  1499,  1506,  1515,  1531,  1550,  1560,  1561,  1562,  1563,
+    1564
 };
 #endif
 
@@ -1695,17 +1698,17 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 172 "compiler_hw3.y"
+#line 175 "compiler_hw3.y"
     {}
     break;
 
   case 3:
-#line 173 "compiler_hw3.y"
+#line 176 "compiler_hw3.y"
     {}
     break;
 
   case 6:
-#line 180 "compiler_hw3.y"
+#line 183 "compiler_hw3.y"
     {
 		//下Jcode的function的參數
 		sprintf(Jcode_buf,".method public static %s(",(yyvsp[(2) - (2)].id_val));
@@ -1715,6 +1718,7 @@ yyreduce:
 		else{
 			strcat(Jcode_buf,function_pra_type);
 			strcat(Jcode_buf,")");
+			printf("uptype:%s\n",function_pra_type);
 
 		}
 		//Jcode去加上function的type
@@ -1747,7 +1751,7 @@ yyreduce:
     break;
 
   case 7:
-#line 218 "compiler_hw3.y"
+#line 222 "compiler_hw3.y"
     {
 		look_function_type_flag = 0;//function結束了，looktype初始化。
 		func_declare_flag = 0;
@@ -1776,7 +1780,7 @@ yyreduce:
     break;
 
   case 8:
-#line 245 "compiler_hw3.y"
+#line 249 "compiler_hw3.y"
     {	if(func_declare_flag == 0){
 				scope_flag++;
                 create_symbol(scope_flag);
@@ -1788,7 +1792,7 @@ yyreduce:
     break;
 
   case 9:
-#line 253 "compiler_hw3.y"
+#line 257 "compiler_hw3.y"
     {
 		scope_flag--;
 		dump_symbol();
@@ -1796,7 +1800,7 @@ yyreduce:
     break;
 
   case 10:
-#line 257 "compiler_hw3.y"
+#line 261 "compiler_hw3.y"
     {	if(func_declare_flag == 0){
 				scope_flag++;
 				create_symbol(scope_flag);
@@ -1808,7 +1812,7 @@ yyreduce:
     break;
 
   case 11:
-#line 265 "compiler_hw3.y"
+#line 269 "compiler_hw3.y"
     {
 		scope_flag--;
 		print_sym_flag = 1;
@@ -1817,7 +1821,7 @@ yyreduce:
     break;
 
   case 23:
-#line 291 "compiler_hw3.y"
+#line 295 "compiler_hw3.y"
     {
 		sprintf(Jcode_buf,"\tldc \"%s\"",(yyvsp[(1) - (1)].string_val));
         writeCode(Jcode_buf);
@@ -1829,7 +1833,7 @@ yyreduce:
     break;
 
   case 24:
-#line 299 "compiler_hw3.y"
+#line 303 "compiler_hw3.y"
     {
         sprintf(Jcode_buf,"\tldc %d",(yyvsp[(1) - (1)].i_val));
         writeCode(Jcode_buf);
@@ -1841,7 +1845,7 @@ yyreduce:
     break;
 
   case 25:
-#line 307 "compiler_hw3.y"
+#line 311 "compiler_hw3.y"
     {
 		sprintf(Jcode_buf,"\tldc %f",(yyvsp[(1) - (1)].f_val));
         writeCode(Jcode_buf);
@@ -1853,7 +1857,7 @@ yyreduce:
     break;
 
   case 26:
-#line 315 "compiler_hw3.y"
+#line 319 "compiler_hw3.y"
     {
 		if(lookup_symbol((yyvsp[(1) - (1)].id_val),"variable")==0 && lookup_global((yyvsp[(1) - (1)].id_val),"variable")==0 &&lookup_symbol((yyvsp[(1) - (1)].id_val),"parameter") == 0 && lookup_global((yyvsp[(1) - (1)].id_val),"parameter") == 0){
 			//print_sym_flag = 2;
@@ -1929,7 +1933,7 @@ yyreduce:
     break;
 
   case 27:
-#line 390 "compiler_hw3.y"
+#line 394 "compiler_hw3.y"
     {
 		//只有void可以不回傳東西！
 		if(look_function_type_flag == 5){
@@ -1946,12 +1950,12 @@ yyreduce:
     break;
 
   case 28:
-#line 403 "compiler_hw3.y"
+#line 407 "compiler_hw3.y"
     {isReturn_flag = 1;}
     break;
 
   case 29:
-#line 403 "compiler_hw3.y"
+#line 407 "compiler_hw3.y"
     {
 		exe_float_flag = 0;
 		isReturn_flag = 0;//return的flag要歸回
@@ -1979,12 +1983,12 @@ yyreduce:
     break;
 
   case 30:
-#line 429 "compiler_hw3.y"
+#line 433 "compiler_hw3.y"
     {isIf_flag = 1;}
     break;
 
   case 31:
-#line 429 "compiler_hw3.y"
+#line 433 "compiler_hw3.y"
     {
 	    isIf_flag = 0;//while判斷的結束
 		//把label++
@@ -2011,7 +2015,7 @@ yyreduce:
     break;
 
   case 32:
-#line 454 "compiler_hw3.y"
+#line 458 "compiler_hw3.y"
     {
         //不要if要去的地方
         sprintf(Jcode_buf,"LABEL_IF_FALSE_%d:",if_stack[if_label_stack]);
@@ -2022,7 +2026,7 @@ yyreduce:
     break;
 
   case 33:
-#line 461 "compiler_hw3.y"
+#line 465 "compiler_hw3.y"
     {
 		//if完要去的地方
 		sprintf(Jcode_buf,"goto LABEL_IF_EXIT_%d",if_stack[if_label_stack]);
@@ -2034,7 +2038,7 @@ yyreduce:
     break;
 
   case 34:
-#line 468 "compiler_hw3.y"
+#line 472 "compiler_hw3.y"
     {
 		//整個ifelse的出口
         sprintf(Jcode_buf,"LABEL_IF_EXIT_%d:",if_stack[if_label_stack]);
@@ -2046,7 +2050,7 @@ yyreduce:
     break;
 
   case 35:
-#line 478 "compiler_hw3.y"
+#line 482 "compiler_hw3.y"
     {
 		//label數++
 		while_label_num++;
@@ -2061,7 +2065,7 @@ yyreduce:
     break;
 
   case 36:
-#line 489 "compiler_hw3.y"
+#line 493 "compiler_hw3.y"
     {
 		isWhile_flag = 0;//while判斷的結束
 		printf("compare:%s\n",(yyvsp[(4) - (5)].id_val));
@@ -2084,7 +2088,7 @@ yyreduce:
     break;
 
   case 37:
-#line 508 "compiler_hw3.y"
+#line 512 "compiler_hw3.y"
     {
 		//回去再判斷的地方
 		sprintf(Jcode_buf,"\tgoto LABEL_WHILE_BEGIN_%d",while_stack[while_label_stack]);
@@ -2098,12 +2102,12 @@ yyreduce:
     break;
 
   case 40:
-#line 524 "compiler_hw3.y"
+#line 528 "compiler_hw3.y"
     {(yyval.id_val)=(yyvsp[(1) - (1)].id_val);}
     break;
 
   case 42:
-#line 529 "compiler_hw3.y"
+#line 533 "compiler_hw3.y"
     {
 //好像用不到		isFun_flag = 0;//用來看declare是不是function的flag結束
 		if(func_declare_flag == 1){
@@ -2123,107 +2127,103 @@ yyreduce:
 			}
 		}
 		else{
+			printf("thisbuf:%s\n",init_declarator_buf);
 			if(lookup_symbol((yyvsp[(2) - (3)].id_val),"variable") == 0&&lookup_symbol((yyvsp[(2) - (3)].id_val),"parameter") == 0&&lookup_symbol((yyvsp[(2) - (3)].id_val),"function") == 0&&lookup_global((yyvsp[(2) - (3)].id_val),"function")==0){
 				insert_symbol((yyvsp[(2) - (3)].id_val),(yyvsp[(1) - (3)].type_val),"variable","");
-				//如果scope是0表示是global的
+				De_ASGNfunction((yyvsp[(1) - (3)].type_val),(yyvsp[(2) - (3)].id_val),init_declarator_buf);
+/*				//如果scope是0表示是global的
 				if(scope_flag == 0){
-					if( strcmp((yyvsp[(1) - (3)].type_val),"float") == 0){
-						sprintf(Jcode_buf,".field public static %s F = %f",(yyvsp[(2) - (3)].id_val),global_float);
+					if( strcmp($1,"float") == 0){
+						sprintf(Jcode_buf,".field public static %s F = %f",$2,global_float);
 						writeCode(Jcode_buf);
-						if(global_float == 0){
-							Jinsert_zero((yyvsp[(2) - (3)].id_val),1);//發現宣告是0
-							printf("ddddd\n");
-						}
 						global_float = 0;
 					}
-					else if( strcmp((yyvsp[(1) - (3)].type_val),"int") == 0){
-						sprintf(Jcode_buf,".field public static %s I = %d",(yyvsp[(2) - (3)].id_val),global_int);
+					else if( strcmp($1,"int") == 0){
+						sprintf(Jcode_buf,".field public static %s I = %d",$2,global_int);
 						writeCode(Jcode_buf);
-						if(global_int == 0){
-							Jinsert_zero((yyvsp[(2) - (3)].id_val),1);//發現宣告是0
-						}
 						global_int = 0;
 					}
-					else if( strcmp((yyvsp[(1) - (3)].type_val),"string")==0){
-						sprintf(Jcode_buf,".field public static %s Ljava/lang/String; = \"%s\"",(yyvsp[(2) - (3)].id_val),global_string);
+					else if( strcmp($1,"string")==0){
+						sprintf(Jcode_buf,".field public static %s Ljava/lang/String; = \"%s\"",$2,global_string);
 						writeCode(Jcode_buf);
 						strcpy(global_string,"");
 					}
-					else if( strcmp((yyvsp[(1) - (3)].type_val),"bool") ==0){
-					    sprintf(Jcode_buf,".field public static %s I = %d",(yyvsp[(2) - (3)].id_val),global_bool);
+					else if( strcmp($1,"bool") ==0){
+					    sprintf(Jcode_buf,".field public static %s I = %d",$2,global_bool);
                         writeCode(Jcode_buf);
                         global_bool = 0;
 					}
+					//算式結束設回去
+					noinitial_flag = 0;
 				}
 				//宣告的地方不是global的
 				else{
 					//如果後面沒有float
 					if( exe_float_flag == 0){
-						if(strcmp((yyvsp[(1) - (3)].type_val),"int")==0){
+						if(strcmp($1,"int")==0){
 							//沒有初始化
 							if(noinitial_flag ==1){
 								sprintf(Jcode_buf,"\tldc 0");
 								writeCode(Jcode_buf);
-								Jinsert_zero((yyvsp[(2) - (3)].id_val),1);//表示會是0
 								noinitial_flag = 0;
 							}
-							sprintf(Jcode_buf,"\tistore %d",getStackindex((yyvsp[(2) - (3)].id_val)));
+							sprintf(Jcode_buf,"\tistore %d",getStackindex($2));
 							writeCode(Jcode_buf);
 						}
-						else if(strcmp((yyvsp[(1) - (3)].type_val),"float")==0){
+						else if(strcmp($1,"float")==0){
                             //沒有初始化
                             if(noinitial_flag ==1){
                                 sprintf(Jcode_buf,"\tldc 0");
                                 writeCode(Jcode_buf);
-								Jinsert_zero((yyvsp[(2) - (3)].id_val),1);//表示會是0
                                 noinitial_flag = 0;                                                                                                           
                             }
 							sprintf(Jcode_buf,"\ti2f");
 							writeCode(Jcode_buf);
-							sprintf(Jcode_buf,"\tfstore %d",getStackindex((yyvsp[(2) - (3)].id_val)));
+							sprintf(Jcode_buf,"\tfstore %d",getStackindex($2));
 							writeCode(Jcode_buf);
 						}
 					}
 					//如果後面有float
 					else if( exe_float_flag == 1){
-						if(strcmp((yyvsp[(1) - (3)].type_val),"int")==0){
+						if(strcmp($1,"int")==0){
 							sprintf(Jcode_buf,"\tf2i");
 							writeCode(Jcode_buf);
-							sprintf(Jcode_buf,"\tistore %d",getStackindex((yyvsp[(2) - (3)].id_val)));
+							sprintf(Jcode_buf,"\tistore %d",getStackindex($2));
 							writeCode(Jcode_buf);
 						}
-						else if(strcmp((yyvsp[(1) - (3)].type_val),"float")==0){
-							sprintf(Jcode_buf,"\tfstore %d",getStackindex((yyvsp[(2) - (3)].id_val)));
+						else if(strcmp($1,"float")==0){
+							sprintf(Jcode_buf,"\tfstore %d",getStackindex($2));
 							writeCode(Jcode_buf);
 						}
 					}
 					//跟上面沒關係，如果宣告的是string
-					if( strcmp((yyvsp[(1) - (3)].type_val),"string") == 0){
-						sprintf(Jcode_buf,"\tastore %d",getStackindex((yyvsp[(2) - (3)].id_val)));
+					if( strcmp($1,"string") == 0){
+						sprintf(Jcode_buf,"\tastore %d",getStackindex($2));
 						writeCode(Jcode_buf);
 					}
 					//跟上面沒關係，如果宣告的是bool
-					if( strcmp((yyvsp[(1) - (3)].type_val),"bool") == 0){
+					if( strcmp($1,"bool") == 0){
 						//沒有初始化
 						if(noinitial_flag ==1){
 							sprintf(Jcode_buf,"\tldc 0");
 							writeCode(Jcode_buf);
 							noinitial_flag = 0;
 						}
-						sprintf(Jcode_buf,"\tistore %d",getStackindex((yyvsp[(2) - (3)].id_val)));
+						sprintf(Jcode_buf,"\tistore %d",getStackindex($2));
 						writeCode(Jcode_buf);
 					}
 				}
 				exe_float_flag = 0;
-
+*/
 			}
-			else{
+		else{
 				//print_sym_flag = 2;
 				print_semantic_flag = 1;
 				strcat(message_buf,"Redeclared variable ");
 				strcat(message_buf,(yyvsp[(2) - (3)].id_val));
 			}
         }
+		strcpy(init_declarator_buf,"");//把上傳用的buf清空
 	
 	}
     break;
@@ -2240,6 +2240,7 @@ yyreduce:
 #line 658 "compiler_hw3.y"
     {
 		(yyval.id_val)=(yyvsp[(1) - (4)].id_val);
+		strcpy(init_declarator_buf,(yyvsp[(4) - (4)].id_val));//把initializer上傳
 		assign_right = 0;//“=”右邊使用結束
 		printf("itype:%s\n",(yyvsp[(4) - (4)].id_val));
 		if(strcmp((yyvsp[(4) - (4)].id_val),"IZERO") == 0 || strcmp((yyvsp[(4) - (4)].id_val),"FZERO") == 0){
@@ -2249,7 +2250,7 @@ yyreduce:
     break;
 
   case 45:
-#line 666 "compiler_hw3.y"
+#line 667 "compiler_hw3.y"
     {
 		(yyval.id_val)=(yyvsp[(1) - (1)].id_val);
 		/*
@@ -2266,37 +2267,38 @@ yyreduce:
     break;
 
   case 46:
-#line 682 "compiler_hw3.y"
+#line 683 "compiler_hw3.y"
     {(yyval.id_val)=(yyvsp[(1) - (1)].id_val);}
     break;
 
   case 47:
-#line 685 "compiler_hw3.y"
+#line 686 "compiler_hw3.y"
     {	
 		(yyval.id_val)=(yyvsp[(1) - (1)].id_val);
 	}
     break;
 
   case 48:
-#line 688 "compiler_hw3.y"
+#line 689 "compiler_hw3.y"
     {printf("111\n");func_declare_flag = 1;scope_flag++;create_symbol(scope_flag);}
     break;
 
   case 50:
-#line 689 "compiler_hw3.y"
+#line 690 "compiler_hw3.y"
     {printf("333\n");func_declare_flag = 1;scope_flag++;create_symbol(scope_flag);}
     break;
 
   case 56:
-#line 700 "compiler_hw3.y"
+#line 701 "compiler_hw3.y"
     {
 		strcpy(attribute_buf,(yyvsp[(1) - (1)].type_val));
 		strcat(attribute_buf,"\0");
+		printf("type:%si\n",(yyvsp[(1) - (1)].type_val));
 		//Jcode用的type
 		if( strcmp((yyvsp[(1) - (1)].type_val),"int") == 0){
 			strcpy(function_pra_type,"I");
 		}
-		else if( strcmp((yyvsp[(1) - (1)].type_val),"flaot") == 0){
+		else if( strcmp((yyvsp[(1) - (1)].type_val),"float") == 0){
 			strcpy(function_pra_type,"F");
 		}
 		else if( strcmp((yyvsp[(1) - (1)].type_val),"bool") == 0){
@@ -2306,16 +2308,17 @@ yyreduce:
     break;
 
   case 57:
-#line 714 "compiler_hw3.y"
+#line 716 "compiler_hw3.y"
     {
 		strcat(attribute_buf,", ");
 		strcat(attribute_buf,(yyvsp[(3) - (3)].type_val));
 		strcat(attribute_buf,"\0");
+		printf("type:%si\n",(yyvsp[(3) - (3)].type_val));
 		//Jcode用的type
 		if( strcmp((yyvsp[(3) - (3)].type_val),"int") == 0){
             strcat(function_pra_type,"I");
         }
-        else if( strcmp((yyvsp[(3) - (3)].type_val),"flaot") == 0){
+        else if( strcmp((yyvsp[(3) - (3)].type_val),"float") == 0){
             strcat(function_pra_type,"F");
         }
 		else if( strcmp((yyvsp[(3) - (3)].type_val),"bool") == 0){
@@ -2326,7 +2329,7 @@ yyreduce:
     break;
 
   case 58:
-#line 732 "compiler_hw3.y"
+#line 735 "compiler_hw3.y"
     {
 		(yyval.type_val)=(yyvsp[(1) - (2)].type_val);
 		if(lookup_symbol((yyvsp[(2) - (2)].id_val),"paremeter") == 0){
@@ -2341,17 +2344,17 @@ yyreduce:
     break;
 
   case 59:
-#line 745 "compiler_hw3.y"
+#line 748 "compiler_hw3.y"
     {(yyval.id_val) = (yyvsp[(1) - (1)].id_val);}
     break;
 
   case 60:
-#line 748 "compiler_hw3.y"
+#line 751 "compiler_hw3.y"
     {(yyval.id_val)=(yyvsp[(1) - (1)].id_val);}
     break;
 
   case 61:
-#line 749 "compiler_hw3.y"
+#line 752 "compiler_hw3.y"
     {
 		assign_right = 1;
 		exe_float_flag = 0;
@@ -2359,92 +2362,93 @@ yyreduce:
     break;
 
   case 62:
-#line 753 "compiler_hw3.y"
+#line 756 "compiler_hw3.y"
     {
 		assign_right = 0;//完成之後要把flag設回去
 		//"="符號
 		if((yyvsp[(2) - (4)].assign_flag) == 1){
-			//不是global
-			if(getStackindex((yyvsp[(1) - (4)].id_val)) != -1){
+			ASGNfunction((yyvsp[(1) - (4)].id_val),(yyvsp[(4) - (4)].id_val));
+/*			//不是global
+			if(getStackindex($1) != -1){
 				//等號左邊是int
-				if(lookNglobal_type((yyvsp[(1) - (4)].id_val)) == 1){
+				if(lookNglobal_type($1) == 1){
 					//右邊是int
 					if(exe_float_flag == 0){
-						sprintf(Jcode_buf,"\tistore %d",getStackindex((yyvsp[(1) - (4)].id_val)));
+						sprintf(Jcode_buf,"\tistore %d",getStackindex($1));
 						writeCode(Jcode_buf);
 					}
 					//右邊是float
 					else if(exe_float_flag == 1){
 						sprintf(Jcode_buf,"\tf2i");
 						writeCode(Jcode_buf);
-						sprintf(Jcode_buf,"\tistore %d",getStackindex((yyvsp[(1) - (4)].id_val)));
+						sprintf(Jcode_buf,"\tistore %d",getStackindex($1));
 						writeCode(Jcode_buf);
 					}
 				}
 				//等號左邊是float
-				else if(lookNglobal_type((yyvsp[(1) - (4)].id_val)) == 2){
+				else if(lookNglobal_type($1) == 2){
 					//右邊是int
 					if(exe_float_flag == 0){
-						sprintf(Jcode_buf,"\ti2f\n");
+						sprintf(Jcode_buf,"\ti2f");
 						writeCode(Jcode_buf);
-						sprintf(Jcode_buf,"\tfstore %d",getStackindex((yyvsp[(1) - (4)].id_val)));
+						sprintf(Jcode_buf,"\tfstore %d",getStackindex($1));
 						writeCode(Jcode_buf);
 					}
 					//右邊是float
 					else if(exe_float_flag == 1){
-						sprintf(Jcode_buf,"\tfstore %d",getStackindex((yyvsp[(1) - (4)].id_val)));
+						sprintf(Jcode_buf,"\tfstore %d",getStackindex($1));
 						writeCode(Jcode_buf);
 					}
 				}
 				//等號左邊是bool
-				else if(lookNglobal_type((yyvsp[(1) - (4)].id_val)) == 4){
-					sprintf(Jcode_buf,"\tistore %d",getStackindex((yyvsp[(1) - (4)].id_val)));
+				else if(lookNglobal_type($1) == 4){
+					sprintf(Jcode_buf,"\tistore %d",getStackindex($1));
 					writeCode(Jcode_buf);
 				}
 				//string不用考慮先宣告才賦值
 			}
 			//是global
-			else if(getStackindex((yyvsp[(1) - (4)].id_val)) == -1){
+			else if(getStackindex($1) == -1){
 				//等號左邊是int
-                if(lookglobal_type((yyvsp[(1) - (4)].id_val)) == 1){
+                if(lookglobal_type($1) == 1){
                     //右邊是int
                     if(exe_float_flag == 0){
-                        sprintf(Jcode_buf,"\tputstatic compiler_hw3/%s I",(yyvsp[(1) - (4)].id_val));
+                        sprintf(Jcode_buf,"\tputstatic compiler_hw3/%s I",$1);
                         writeCode(Jcode_buf);
                     }   
                     //右邊是float
                     else if(exe_float_flag == 1){
                         sprintf(Jcode_buf,"\tf2i");
                         writeCode(Jcode_buf);
-                        sprintf(Jcode_buf,"\tputstatic compiler_hw3/%s I",(yyvsp[(1) - (4)].id_val));
+                        sprintf(Jcode_buf,"\tputstatic compiler_hw3/%s I",$1);
                         writeCode(Jcode_buf);
                     }   
                 }   
                 //等號左邊是float
-                else if(lookglobal_type((yyvsp[(1) - (4)].id_val)) == 2){
+                else if(lookglobal_type($1) == 2){
                     //右邊是int
                     if(exe_float_flag == 0){
-                        sprintf(Jcode_buf,"\ti2f\n");
+                        sprintf(Jcode_buf,"\ti2f");
                         writeCode(Jcode_buf);
-                        sprintf(Jcode_buf,"\tputstatic compiler_hw3/%s F",(yyvsp[(1) - (4)].id_val));
+                        sprintf(Jcode_buf,"\tputstatic compiler_hw3/%s F",$1);
                         writeCode(Jcode_buf);
                     }   
                     //右邊是float
                     else if(exe_float_flag == 1){
-                        sprintf(Jcode_buf,"\tputstatic compiler_hw3/%s F",(yyvsp[(1) - (4)].id_val));
+                        sprintf(Jcode_buf,"\tputstatic compiler_hw3/%s F",$1);
                         writeCode(Jcode_buf);
                     }   
                 }
 				//等號左邊是bool
-				else if(lookglobal_type((yyvsp[(1) - (4)].id_val)) == 4){
-					sprintf(Jcode_buf,"\tputstatic compiler_hw3/%s I",(yyvsp[(1) - (4)].id_val));
+				else if(lookglobal_type($1) == 4){
+					sprintf(Jcode_buf,"\tputstatic compiler_hw3/%s I",$1);
 					writeCode(Jcode_buf);
 				}
 				//string不用考慮先宣告再賦值
 
 			}
 			exe_float_flag = 0;//回歸沒有
-		}
+*/		}
 		//是“+=”
 		else if((yyvsp[(2) - (4)].assign_flag) == 2){
 			printf("test:%s\n",(yyvsp[(4) - (4)].id_val));
@@ -2459,6 +2463,7 @@ yyreduce:
 			MULASGNfunction((yyvsp[(1) - (4)].id_val),(yyvsp[(4) - (4)].id_val));
 		}
 		else if((yyvsp[(2) - (4)].assign_flag) == 5){
+			DIVASGNfunction((yyvsp[(1) - (4)].id_val),(yyvsp[(4) - (4)].id_val));
 		}
 		else if((yyvsp[(2) - (4)].assign_flag) == 6){
 			MODASGNfunction((yyvsp[(1) - (4)].id_val),(yyvsp[(4) - (4)].id_val));
@@ -2468,42 +2473,42 @@ yyreduce:
     break;
 
   case 63:
-#line 861 "compiler_hw3.y"
+#line 866 "compiler_hw3.y"
     {(yyval.assign_flag) = 1;}
     break;
 
   case 64:
-#line 862 "compiler_hw3.y"
+#line 867 "compiler_hw3.y"
     {(yyval.assign_flag) = 2;}
     break;
 
   case 65:
-#line 863 "compiler_hw3.y"
+#line 868 "compiler_hw3.y"
     {(yyval.assign_flag) = 3;}
     break;
 
   case 66:
-#line 864 "compiler_hw3.y"
+#line 869 "compiler_hw3.y"
     {(yyval.assign_flag) = 4;}
     break;
 
   case 67:
-#line 865 "compiler_hw3.y"
+#line 870 "compiler_hw3.y"
     {(yyval.assign_flag) = 5;}
     break;
 
   case 68:
-#line 866 "compiler_hw3.y"
+#line 871 "compiler_hw3.y"
     {(yyval.assign_flag) = 6;}
     break;
 
   case 69:
-#line 869 "compiler_hw3.y"
+#line 874 "compiler_hw3.y"
     {(yyval.id_val)=(yyvsp[(1) - (1)].id_val);}
     break;
 
   case 70:
-#line 870 "compiler_hw3.y"
+#line 875 "compiler_hw3.y"
     {
 		//來看要不要轉float
 		RE_cha_function((yyvsp[(1) - (3)].id_val),(yyvsp[(3) - (3)].id_val));
@@ -2516,7 +2521,7 @@ yyreduce:
     break;
 
   case 71:
-#line 879 "compiler_hw3.y"
+#line 884 "compiler_hw3.y"
     {
 		RE_cha_function((yyvsp[(1) - (3)].id_val),(yyvsp[(3) - (3)].id_val));
 		//先做swap，這樣就會反過來，如果前面小於後面就會是1
@@ -2530,7 +2535,7 @@ yyreduce:
     break;
 
   case 72:
-#line 889 "compiler_hw3.y"
+#line 894 "compiler_hw3.y"
     {
 		RE_cha_function((yyvsp[(1) - (3)].id_val),(yyvsp[(3) - (3)].id_val));
 		//如果前面大於等於後面就會是0or1
@@ -2541,7 +2546,7 @@ yyreduce:
     break;
 
   case 73:
-#line 896 "compiler_hw3.y"
+#line 901 "compiler_hw3.y"
     {
 		RE_cha_function((yyvsp[(1) - (3)].id_val),(yyvsp[(3) - (3)].id_val));
 		//先做swap，這樣就會反過來，如果前面小於等於後面就會是0or1
@@ -2554,7 +2559,7 @@ yyreduce:
     break;
 
   case 74:
-#line 905 "compiler_hw3.y"
+#line 910 "compiler_hw3.y"
     {
 		RE_cha_function((yyvsp[(1) - (3)].id_val),(yyvsp[(3) - (3)].id_val));
 		//如果前面等於後面就是0
@@ -2565,7 +2570,7 @@ yyreduce:
     break;
 
   case 75:
-#line 912 "compiler_hw3.y"
+#line 917 "compiler_hw3.y"
     {
 		RE_cha_function((yyvsp[(1) - (3)].id_val),(yyvsp[(3) - (3)].id_val));
 		//如果前面不等於後面就會是1or-1
@@ -2576,12 +2581,12 @@ yyreduce:
     break;
 
   case 76:
-#line 921 "compiler_hw3.y"
+#line 926 "compiler_hw3.y"
     {(yyval.id_val) = (yyvsp[(1) - (1)].id_val);}
     break;
 
   case 77:
-#line 922 "compiler_hw3.y"
+#line 927 "compiler_hw3.y"
     {
 		ADDfunction((yyvsp[(1) - (3)].id_val),(yyvsp[(3) - (3)].id_val));
 		//處理cast的問題
@@ -2624,7 +2629,7 @@ yyreduce:
     break;
 
   case 78:
-#line 961 "compiler_hw3.y"
+#line 966 "compiler_hw3.y"
     {
 		//處理cast的問題
         //兩個都是int
@@ -2668,12 +2673,12 @@ yyreduce:
     break;
 
   case 79:
-#line 1003 "compiler_hw3.y"
+#line 1008 "compiler_hw3.y"
     {(yyval.id_val) = (yyvsp[(1) - (1)].id_val);}
     break;
 
   case 80:
-#line 1004 "compiler_hw3.y"
+#line 1009 "compiler_hw3.y"
     {
 		//處理cast的問題
         //兩個都是int
@@ -2718,7 +2723,7 @@ yyreduce:
     break;
 
   case 81:
-#line 1045 "compiler_hw3.y"
+#line 1050 "compiler_hw3.y"
     {
 		//DIV的function
 		DIVfunction((yyvsp[(1) - (3)].id_val),(yyvsp[(3) - (3)].id_val));
@@ -2746,7 +2751,7 @@ yyreduce:
     break;
 
   case 82:
-#line 1069 "compiler_hw3.y"
+#line 1074 "compiler_hw3.y"
     {
         //沒有cast的問題
         printf("%s %s\n",(yyvsp[(1) - (3)].id_val),(yyvsp[(3) - (3)].id_val));
@@ -2761,12 +2766,12 @@ yyreduce:
     break;
 
   case 83:
-#line 1082 "compiler_hw3.y"
+#line 1087 "compiler_hw3.y"
     {(yyval.id_val)=(yyvsp[(1) - (1)].id_val);}
     break;
 
   case 86:
-#line 1085 "compiler_hw3.y"
+#line 1090 "compiler_hw3.y"
     {
 		if(strcmp((yyvsp[(1) - (2)].id_val),"minus") == 0){
 			if( lookNglobal_type((yyvsp[(2) - (2)].id_val)) == 1 || lookglobal_type((yyvsp[(2) - (2)].id_val))==1){
@@ -2795,14 +2800,14 @@ yyreduce:
     break;
 
   case 87:
-#line 1112 "compiler_hw3.y"
+#line 1117 "compiler_hw3.y"
     {
 		(yyval.id_val) = "plus";
 	}
     break;
 
   case 88:
-#line 1115 "compiler_hw3.y"
+#line 1120 "compiler_hw3.y"
     {
 		(yyval.id_val) = "minus";
 		sprintf(Jcode_buf,"\tldc 0");
@@ -2811,12 +2816,12 @@ yyreduce:
     break;
 
   case 89:
-#line 1123 "compiler_hw3.y"
+#line 1128 "compiler_hw3.y"
     {(yyval.id_val)=(yyvsp[(1) - (1)].id_val);}
     break;
 
   case 90:
-#line 1124 "compiler_hw3.y"
+#line 1129 "compiler_hw3.y"
     {
 		//如果要++的型態是int
 		if(lookNglobal_type((yyvsp[(1) - (2)].id_val)) == 1 || lookglobal_type((yyvsp[(1) - (2)].id_val)) == 1){
@@ -2874,7 +2879,7 @@ yyreduce:
     break;
 
   case 91:
-#line 1178 "compiler_hw3.y"
+#line 1183 "compiler_hw3.y"
     {
 		//--型態是int
         if(lookNglobal_type((yyvsp[(1) - (2)].id_val)) == 1 || lookglobal_type((yyvsp[(1) - (2)].id_val)) == 1){
@@ -2932,12 +2937,12 @@ yyreduce:
     break;
 
   case 92:
-#line 1232 "compiler_hw3.y"
+#line 1237 "compiler_hw3.y"
     {isFun_flag = 1;strcpy(function_arg_type,"");}
     break;
 
   case 93:
-#line 1232 "compiler_hw3.y"
+#line 1237 "compiler_hw3.y"
     {
 		isFun_flag = 0;//function結束，argement也輸入完
 		if(lookup_global((yyvsp[(1) - (5)].id_val),"function") != 2){
@@ -2985,7 +2990,7 @@ yyreduce:
     break;
 
   case 94:
-#line 1276 "compiler_hw3.y"
+#line 1281 "compiler_hw3.y"
     {
 		if(lookup_global((yyvsp[(1) - (3)].id_val),"function") != 2){
             //print_sym_flag = 2;
@@ -3034,7 +3039,7 @@ yyreduce:
     break;
 
   case 95:
-#line 1323 "compiler_hw3.y"
+#line 1328 "compiler_hw3.y"
     {
 		//用來紀錄輸入了哪些argument
 		printf("::%s\n",(yyvsp[(1) - (1)].id_val));
@@ -3050,7 +3055,7 @@ yyreduce:
     break;
 
   case 96:
-#line 1335 "compiler_hw3.y"
+#line 1340 "compiler_hw3.y"
     {
 		 //用來紀錄輸入了哪些argument
         printf("::%s\n",(yyvsp[(3) - (3)].id_val));
@@ -3064,7 +3069,7 @@ yyreduce:
     break;
 
   case 97:
-#line 1347 "compiler_hw3.y"
+#line 1352 "compiler_hw3.y"
     {
 		(yyval.id_val)=(yyvsp[(1) - (1)].id_val);
 		if(lookup_global((yyvsp[(1) - (1)].id_val),"variable") == 0 && lookup_symbol((yyvsp[(1) - (1)].id_val),"variable" )==0 &&lookup_global((yyvsp[(1) - (1)].id_val),"parameter") == 0 && lookup_symbol((yyvsp[(1) - (1)].id_val),"parameter")==0 &&lookup_global((yyvsp[(1) - (1)].id_val),"function") == 0 && lookup_symbol((yyvsp[(1) - (1)].id_val),"function" )==0){
@@ -3210,12 +3215,12 @@ yyreduce:
     break;
 
   case 98:
-#line 1489 "compiler_hw3.y"
+#line 1494 "compiler_hw3.y"
     {(yyval.id_val) = (yyvsp[(1) - (1)].id_val);}
     break;
 
   case 101:
-#line 1494 "compiler_hw3.y"
+#line 1499 "compiler_hw3.y"
     {
 		global_bool = 1;
 		if(scope_flag > 0){
@@ -3226,7 +3231,7 @@ yyreduce:
     break;
 
   case 102:
-#line 1501 "compiler_hw3.y"
+#line 1506 "compiler_hw3.y"
     {
 		global_bool = 0;
 		if(scope_flag > 0){
@@ -3237,7 +3242,7 @@ yyreduce:
     break;
 
   case 103:
-#line 1510 "compiler_hw3.y"
+#line 1515 "compiler_hw3.y"
     {
 		//要看這個常數是不是0
 		if( (yyvsp[(1) - (1)].i_val) == 0 ){
@@ -3257,7 +3262,7 @@ yyreduce:
     break;
 
   case 104:
-#line 1526 "compiler_hw3.y"
+#line 1531 "compiler_hw3.y"
     {
 		//要看這個常數是不是0
 		if( (yyvsp[(1) - (1)].f_val) == 0){
@@ -3278,7 +3283,7 @@ yyreduce:
     break;
 
   case 105:
-#line 1545 "compiler_hw3.y"
+#line 1550 "compiler_hw3.y"
     {
 		(yyval.id_val) = "STRCONST";
 		sprintf(global_string,"%s",(yyvsp[(1) - (1)].string_val));
@@ -3290,33 +3295,33 @@ yyreduce:
     break;
 
   case 106:
-#line 1555 "compiler_hw3.y"
+#line 1560 "compiler_hw3.y"
     { (yyval.type_val) = (yyvsp[(1) - (1)].type_val);}
     break;
 
   case 107:
-#line 1556 "compiler_hw3.y"
+#line 1561 "compiler_hw3.y"
     { (yyval.type_val) = (yyvsp[(1) - (1)].type_val); }
     break;
 
   case 108:
-#line 1557 "compiler_hw3.y"
+#line 1562 "compiler_hw3.y"
     { (yyval.type_val) = (yyvsp[(1) - (1)].type_val); }
     break;
 
   case 109:
-#line 1558 "compiler_hw3.y"
+#line 1563 "compiler_hw3.y"
     { (yyval.type_val) = (yyvsp[(1) - (1)].type_val); }
     break;
 
   case 110:
-#line 1559 "compiler_hw3.y"
+#line 1564 "compiler_hw3.y"
     { (yyval.type_val) = (yyvsp[(1) - (1)].type_val); }
     break;
 
 
 /* Line 1267 of yacc.c.  */
-#line 3320 "y.tab.c"
+#line 3325 "y.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -3530,7 +3535,7 @@ yyreturn:
 }
 
 
-#line 1561 "compiler_hw3.y"
+#line 1566 "compiler_hw3.y"
 
 
 /* C code section */
@@ -3759,6 +3764,7 @@ int getStackindex(char* var_name){
 	int i;
 	int scope;
 	int stack_index=0;
+	int real_stack_index=-2;
 	Node* tempnode;
 	tempnode = First;
 	while(tempnode!=NULL){
@@ -3766,10 +3772,11 @@ int getStackindex(char* var_name){
 		for(i = 0 ; i < tempnode->var_index ; i++){
 			if(strcmp(var_name,tempnode->STable[i].name) == 0){
 				if(scope == 0){
-					return -1;
+					real_stack_index = -1;
 				}
 				else{
-					return stack_index;
+					real_stack_index = stack_index;
+					stack_index++;
 				}
 			}
 			else{
@@ -3781,7 +3788,7 @@ int getStackindex(char* var_name){
 		}
 		tempnode = tempnode->next;
 	}
-	return -2;
+	return real_stack_index;
 
 }
 int lookglobal_type(char* var_name){
@@ -3869,7 +3876,7 @@ int check_zero(char* var_name){
 	if(strcmp( var_name,"IZERO") == 0 || strcmp(var_name,"FZERO") == 0){
 		is_zero = 1;
 	}
-	else{
+/*	else{
 
 		while(tempnode != NULL){
 			for(i = 0 ; i < tempnode->var_index ; i++){
@@ -3885,7 +3892,7 @@ int check_zero(char* var_name){
 			tempnode = tempnode->next;
 		}
 	}
-
+*/
 	return is_zero;
 }
 void Loadfunction(char* left){
@@ -3918,12 +3925,12 @@ void Storefunction(char* left,char* right){
 		//等號左邊是int
 		if(lookNglobal_type(left) == 1){
 			//右邊是int
-			if(lookNglobal_type(right) == 1){
+			if(lookNglobal_type(right) == 1 || lookglobal_type(right) == 1){
 				sprintf(Jcode_buf,"\tistore %d",getStackindex(left));
 				writeCode(Jcode_buf);
 			}
 			//右邊是float
-			else if(lookNglobal_type(right) == 2){
+			else if(lookNglobal_type(right) == 2 || lookglobal_type(right) == 2){
 				sprintf(Jcode_buf,"\tf2i");
 				writeCode(Jcode_buf);
 				sprintf(Jcode_buf,"\tistore %d",getStackindex(left));
@@ -3933,12 +3940,12 @@ void Storefunction(char* left,char* right){
 		//等號左邊是float
 		else if(lookNglobal_type(left) == 2){
 			//右邊是int//不需要i2f，因為先做運算之後就會變成float了
-			if(lookNglobal_type(right) == 1){
+			if(lookNglobal_type(right) == 1 || lookglobal_type(right) == 1){
 				sprintf(Jcode_buf,"\tfstore %d",getStackindex(left));
 				writeCode(Jcode_buf);
 			}
 			//右邊是float
-			else if(lookNglobal_type(right) == 2){
+			else if(lookNglobal_type(right) == 2 || lookglobal_type(right) == 2){
 				sprintf(Jcode_buf,"\tfstore %d",getStackindex(left));
 				writeCode(Jcode_buf);
 			}
@@ -3955,12 +3962,12 @@ void Storefunction(char* left,char* right){
 		//等號左邊是int
 		if(lookglobal_type(left) == 1){
 			//右邊是int
-			if(lookglobal_type(right) == 1){
+			if(lookglobal_type(right) == 1 || lookNglobal_type(right) == 1){
 				sprintf(Jcode_buf,"\tputstatic compiler_hw3/%s I",left);
 				writeCode(Jcode_buf);
 			}   
 			//右邊是float
-			else if(lookglobal_type(right)  == 2){
+			else if(lookglobal_type(right)  == 2 || lookNglobal_type(right) == 1){
 				sprintf(Jcode_buf,"\tf2i");
 				writeCode(Jcode_buf);
 				sprintf(Jcode_buf,"\tputstatic compiler_hw3/%s I",left);
@@ -3970,12 +3977,93 @@ void Storefunction(char* left,char* right){
 		//等號左邊是float
 		else if(lookglobal_type(left) == 2){
 			//右邊是int//不需要i2f，因為先做運算之後就會變成float了
-			if(lookglobal_type(right) == 1){
+			if(lookglobal_type(right) == 1 || lookNglobal_type(right) == 1){
 				sprintf(Jcode_buf,"\tputstatic compiler_hw3/%s F",left);
 				writeCode(Jcode_buf);
 			}   
 			//右邊是float
-			else if(lookglobal_type(right) == 2){
+			else if(lookglobal_type(right) == 2 || lookNglobal_type(right) == 2){
+				sprintf(Jcode_buf,"\tputstatic compiler_hw3/%s F",left);
+				writeCode(Jcode_buf);
+			}   
+		}
+		//等號左邊是bool
+		else if(lookglobal_type(left) == 4){
+			sprintf(Jcode_buf,"\tputstatic compiler_hw3/%s I",left);
+			writeCode(Jcode_buf);
+		}
+		//string不用考慮先宣告再賦值
+
+	}
+}
+void ASGNfunction(char* left,char* right){
+	//不是global
+	if(getStackindex(left) != -1){
+		//等號左邊是int
+		if(lookNglobal_type(left) == 1){
+			//右邊是int
+			if(lookNglobal_type(right) == 1 || lookglobal_type(right) == 1){
+				sprintf(Jcode_buf,"\tistore %d",getStackindex(left));
+				writeCode(Jcode_buf);
+			}
+			//右邊是float
+			else if(lookNglobal_type(right) == 2 || lookglobal_type(right) == 2){
+				sprintf(Jcode_buf,"\tf2i");
+				writeCode(Jcode_buf);
+				sprintf(Jcode_buf,"\tistore %d",getStackindex(left));
+				writeCode(Jcode_buf);
+			}
+		}
+		//等號左邊是float
+		else if(lookNglobal_type(left) == 2){
+			//右邊是int
+			if(lookNglobal_type(right) == 1 || lookglobal_type(right) == 1){
+				sprintf(Jcode_buf,"\ti2f");
+				writeCode(Jcode_buf);
+				sprintf(Jcode_buf,"\tfstore %d",getStackindex(left));
+				writeCode(Jcode_buf);
+			}
+			//右邊是float
+			else if(lookNglobal_type(right) == 2 || lookglobal_type(right) == 2){
+				sprintf(Jcode_buf,"\tfstore %d",getStackindex(left));
+				writeCode(Jcode_buf);
+			}
+		}
+		//等號左邊是bool
+		else if(lookNglobal_type(left) == 4){
+			sprintf(Jcode_buf,"\tistore %d",getStackindex(left));
+			writeCode(Jcode_buf);
+		}
+		//string不用考慮先宣告才賦值
+	}
+	//是global
+	else if(getStackindex(left) == -1){
+		//等號左邊是int
+		if(lookglobal_type(left) == 1){
+			//右邊是int
+			if(lookglobal_type(right) == 1 || lookNglobal_type(right) == 1){
+				sprintf(Jcode_buf,"\tputstatic compiler_hw3/%s I",left);
+				writeCode(Jcode_buf);
+			}   
+			//右邊是float
+			else if(lookglobal_type(right)  == 2 || lookNglobal_type(right) == 1){
+				sprintf(Jcode_buf,"\tf2i");
+				writeCode(Jcode_buf);
+				sprintf(Jcode_buf,"\tputstatic compiler_hw3/%s I",left);
+				writeCode(Jcode_buf);
+			}   
+		}   
+		//等號左邊是float
+		else if(lookglobal_type(left) == 2){
+			//右邊是int
+			if(lookglobal_type(right) == 1 || lookNglobal_type(right) == 1){
+				sprintf(Jcode_buf,"\ti2f");
+                writeCode(Jcode_buf);  
+				sprintf(Jcode_buf,"\tputstatic compiler_hw3/%s F",left);
+				writeCode(Jcode_buf);
+			}   
+			//右邊是float
+			else if(lookglobal_type(right) == 2 || lookNglobal_type(right) == 2){
 				sprintf(Jcode_buf,"\tputstatic compiler_hw3/%s F",left);
 				writeCode(Jcode_buf);
 			}   
@@ -4056,12 +4144,12 @@ void ADDASGNfunction(char* left , char* right){
 		//等號左邊是int
 		if(lookNglobal_type(left) == 1){
 			//右邊是int
-			if(lookNglobal_type(right) == 1){
+			if(lookNglobal_type(right) == 1 || lookglobal_type(right) == 1){
 				sprintf(Jcode_buf,"\tistore %d",getStackindex(left));
 				writeCode(Jcode_buf);
 			}
 			//右邊是float
-			else if(lookNglobal_type(right) == 2){
+			else if(lookNglobal_type(right) == 2 || lookglobal_type(right) == 2){
 				sprintf(Jcode_buf,"\tf2i");
 				writeCode(Jcode_buf);
 				sprintf(Jcode_buf,"\tistore %d",getStackindex(left));
@@ -4071,12 +4159,12 @@ void ADDASGNfunction(char* left , char* right){
 		//等號左邊是float
 		else if(lookNglobal_type(left) == 2){
 			//右邊是int//不需要i2f，因為先做運算之後就會變成float了
-			if(lookNglobal_type(right) == 1){
+			if(lookNglobal_type(right) == 1 || lookglobal_type(right) == 1){
 				sprintf(Jcode_buf,"\tfstore %d",getStackindex(left));
 				writeCode(Jcode_buf);
 			}
 			//右邊是float
-			else if(lookNglobal_type(right) == 2){
+			else if(lookNglobal_type(right) == 2 || lookglobal_type(right) == 2){
 				sprintf(Jcode_buf,"\tfstore %d",getStackindex(left));
 				writeCode(Jcode_buf);
 			}
@@ -4093,12 +4181,12 @@ void ADDASGNfunction(char* left , char* right){
 		//等號左邊是int
 		if(lookglobal_type(left) == 1){
 			//右邊是int
-			if(lookglobal_type(right) == 1){
+			if(lookglobal_type(right) == 1 || lookNglobal_type(right) == 1){
 				sprintf(Jcode_buf,"\tputstatic compiler_hw3/%s I",left);
 				writeCode(Jcode_buf);
 			}   
 			//右邊是float
-			else if(lookglobal_type(right)  == 2){
+			else if(lookglobal_type(right)  == 2 || lookNglobal_type(right) == 2){
 				sprintf(Jcode_buf,"\tf2i");
 				writeCode(Jcode_buf);
 				sprintf(Jcode_buf,"\tputstatic compiler_hw3/%s I",left);
@@ -4108,12 +4196,12 @@ void ADDASGNfunction(char* left , char* right){
 		//等號左邊是float
 		else if(lookglobal_type(left) == 2){
 			//右邊是int//不需要i2f，因為先做運算之後就會變成float了
-			if(lookglobal_type(right) == 1){
+			if(lookglobal_type(right) == 1 || lookNglobal_type(right) == 1){
 				sprintf(Jcode_buf,"\tputstatic compiler_hw3/%s F",left);
 				writeCode(Jcode_buf);
 			}   
 			//右邊是float
-			else if(lookglobal_type(right) == 2){
+			else if(lookglobal_type(right) == 2 || lookglobal_type(right) == 2){
 				sprintf(Jcode_buf,"\tputstatic compiler_hw3/%s F",left);
 				writeCode(Jcode_buf);
 			}   
@@ -4282,6 +4370,17 @@ void DIVfunction(char* left,char*right){
         exe_float_flag = 1;                                                                                                                                   
     }
 }
+void DIVASGNfunction(char* left,char* right){
+    //load出來
+    Loadfunction(left);
+    //要swap
+    sprintf(Jcode_buf,"\tswap");
+    writeCode(Jcode_buf);
+    //做DIV
+    DIVfunction(left,right);
+    //存回去
+    Storefunction(left,right);
+}
 void RE_cha_function(char* left,char* right){
     //處理比較時要換type的問題
     //兩個都是int->兩個都換成float
@@ -4302,5 +4401,101 @@ void RE_cha_function(char* left,char* right){
 		print_semantic_flag = 1;
 		strcpy(message_buf,"這次比較不用考慮兩種不一樣的型態");
     } 	
+}
+void De_ASGNfunction(char* left,char* var_name , char* right){
+	char* name;
+	name = strdup(var_name);
+	printf("infun:%s\n",name);
+	if(scope_flag == 0){
+		if( strcmp(left,"float") == 0){
+			sprintf(Jcode_buf,".field public static %s F = %f",name,global_float);
+			writeCode(Jcode_buf);
+			global_float = 0;
+		}
+		else if( strcmp(left,"int") == 0){
+			sprintf(Jcode_buf,".field public static %s I = %d",name,global_int);
+			writeCode(Jcode_buf);
+			global_int = 0;
+		}
+		else if( strcmp(left,"string")==0){
+			sprintf(Jcode_buf,".field public static %s Ljava/lang/String; = \"%s\"",name,global_string);
+			writeCode(Jcode_buf);
+			strcpy(global_string,"");
+		}
+		else if( strcmp(left,"bool") ==0){
+			sprintf(Jcode_buf,".field public static %s I = %d",name,global_bool);
+			writeCode(Jcode_buf);
+			global_bool = 0;
+		}
+		//算式結束設回去
+		noinitial_flag = 0;
+	}
+	//宣告的地方不是global的
+	else{
+		//如果後面沒有float
+		printf("aaaaa:%d,%d\n",lookglobal_type(right),lookNglobal_type(right));
+		if( noinitial_flag == 1){
+		    //沒有初始化
+			sprintf(Jcode_buf,"\tldc 0");
+			writeCode(Jcode_buf);
+			if(strcmp(left,"int") ==0){
+				sprintf(Jcode_buf,"\tistore %d",getStackindex(name));
+				writeCode(Jcode_buf);
+            }
+			else if(strcmp(left,"float")==0){
+                sprintf(Jcode_buf,"\ti2f");
+                writeCode(Jcode_buf);
+                sprintf(Jcode_buf,"\tfstore %d",getStackindex(name));
+                writeCode(Jcode_buf);
+            }
+			noinitial_flag = 0;
+
+		}
+		//如果後面沒有float
+		if( lookNglobal_type(right) == 1){
+			if(strcmp(left,"int")==0){
+				sprintf(Jcode_buf,"\tistore %d",getStackindex(name));
+				writeCode(Jcode_buf);
+			}
+			else if(strcmp(left,"float")==0){
+				sprintf(Jcode_buf,"\ti2f");
+				writeCode(Jcode_buf);
+				sprintf(Jcode_buf,"\tfstore %d",getStackindex(name));
+				writeCode(Jcode_buf);
+			}
+		}
+		//如果後面有float
+		else if( lookNglobal_type(right) == 2){
+			if(strcmp(left,"int")==0){
+				sprintf(Jcode_buf,"\tf2i");
+				writeCode(Jcode_buf);
+				sprintf(Jcode_buf,"\tistore %d",getStackindex(name));
+				writeCode(Jcode_buf);
+			}
+			else if(strcmp(left,"float")==0){
+				sprintf(Jcode_buf,"\tfstore %d",getStackindex(name));
+				writeCode(Jcode_buf);
+			}
+		}
+
+		//跟上面沒關係，如果宣告的是string
+		if( strcmp(left,"string") == 0){
+			sprintf(Jcode_buf,"\tastore %d",getStackindex(name));
+			writeCode(Jcode_buf);
+		}
+		//跟上面沒關係，如果宣告的是bool
+		if( strcmp(left,"bool") == 0){
+			//沒有初始化
+			if(noinitial_flag ==1){
+				sprintf(Jcode_buf,"\tldc 0");
+				writeCode(Jcode_buf);
+				noinitial_flag = 0;
+			}
+			sprintf(Jcode_buf,"\tistore %d",getStackindex(name));
+			writeCode(Jcode_buf);
+		}
+	}
+	exe_float_flag = 0;
+
 }
 

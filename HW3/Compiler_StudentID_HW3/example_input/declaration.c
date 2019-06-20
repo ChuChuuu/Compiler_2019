@@ -7,7 +7,8 @@ float D = 2.0;
 //bool G;
 bool H=true;
 bool I=false;
-
+int foo1();
+int xxxx();
 int foo1()
 {
     return 2;

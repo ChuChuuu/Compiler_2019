@@ -40,6 +40,7 @@ int while_stack[50];//label的stack
 int if_label_num;//用來記住if用的label
 int if_label_stack;//用來記現在在哪個stack
 int if_stack[50];//用來記住if用的label
+char init_declarator_buf[20];//給init_declarator往上面傳 
 /* Symbol table function - you can add new function if needed. */
 int lookup_symbol(char* name,char* kind);
 int lookup_global(char* name,char* kind);
@@ -68,11 +69,13 @@ void SUBfunction(char* left,char* right);//用來做sub的運算
 void MULfunction(char* left,char* right);//用來做mul的運算
 void MODfunction(char* left,char* right);//用來做mod的運算
 void DIVfunction(char* left,char* right);//用來做div的運算
+void ASGNfunction(char* left, char* right);
 void ADDASGNfunction(char* left ,char* right);
 void SUBASGNfunction(char* left ,char* right);
 void MULASGNfunction(char* left ,char* right);
 void MODASGNfunction(char* left ,char* right);
 void DIVASGNfunction(char* left ,char* right);
+void De_ASGNfunction(char* left ,char* var_name,char* right);
 /*some variable*/
 typedef struct {
 	int int_flag;
@@ -186,6 +189,7 @@ function_definition
 		else{
 			strcat(Jcode_buf,function_pra_type);
 			strcat(Jcode_buf,")");
+			printf("uptype:%s\n",function_pra_type);
 
 		}
 		//Jcode去加上function的type
@@ -545,25 +549,20 @@ declaration
 			}
 		}
 		else{
+			printf("thisbuf:%s\n",init_declarator_buf);
 			if(lookup_symbol($2,"variable") == 0&&lookup_symbol($2,"parameter") == 0&&lookup_symbol($2,"function") == 0&&lookup_global($2,"function")==0){
 				insert_symbol($2,$1,"variable","");
-				//如果scope是0表示是global的
+				De_ASGNfunction($1,$2,init_declarator_buf);
+/*				//如果scope是0表示是global的
 				if(scope_flag == 0){
 					if( strcmp($1,"float") == 0){
 						sprintf(Jcode_buf,".field public static %s F = %f",$2,global_float);
 						writeCode(Jcode_buf);
-						if(global_float == 0){
-							Jinsert_zero($2,1);//發現宣告是0
-							printf("ddddd\n");
-						}
 						global_float = 0;
 					}
 					else if( strcmp($1,"int") == 0){
 						sprintf(Jcode_buf,".field public static %s I = %d",$2,global_int);
 						writeCode(Jcode_buf);
-						if(global_int == 0){
-							Jinsert_zero($2,1);//發現宣告是0
-						}
 						global_int = 0;
 					}
 					else if( strcmp($1,"string")==0){
@@ -576,6 +575,8 @@ declaration
                         writeCode(Jcode_buf);
                         global_bool = 0;
 					}
+					//算式結束設回去
+					noinitial_flag = 0;
 				}
 				//宣告的地方不是global的
 				else{
@@ -586,7 +587,6 @@ declaration
 							if(noinitial_flag ==1){
 								sprintf(Jcode_buf,"\tldc 0");
 								writeCode(Jcode_buf);
-								Jinsert_zero($2,1);//表示會是0
 								noinitial_flag = 0;
 							}
 							sprintf(Jcode_buf,"\tistore %d",getStackindex($2));
@@ -597,7 +597,6 @@ declaration
                             if(noinitial_flag ==1){
                                 sprintf(Jcode_buf,"\tldc 0");
                                 writeCode(Jcode_buf);
-								Jinsert_zero($2,1);//表示會是0
                                 noinitial_flag = 0;                                                                                                           
                             }
 							sprintf(Jcode_buf,"\ti2f");
@@ -637,15 +636,16 @@ declaration
 					}
 				}
 				exe_float_flag = 0;
-
+*/
 			}
-			else{
+		else{
 				//print_sym_flag = 2;
 				print_semantic_flag = 1;
 				strcat(message_buf,"Redeclared variable ");
 				strcat(message_buf,$2);
 			}
         }
+		strcpy(init_declarator_buf,"");//把上傳用的buf清空
 	
 	}
 ;
@@ -657,6 +657,7 @@ init_declarator
 	} 
 	initializer{
 		$$=$1;
+		strcpy(init_declarator_buf,$4);//把initializer上傳
 		assign_right = 0;//“=”右邊使用結束
 		printf("itype:%s\n",$4);
 		if(strcmp($4,"IZERO") == 0 || strcmp($4,"FZERO") == 0){
@@ -700,11 +701,12 @@ parameter_list
 	:parameter_declaration{
 		strcpy(attribute_buf,$1);
 		strcat(attribute_buf,"\0");
+		printf("type:%si\n",$1);
 		//Jcode用的type
 		if( strcmp($1,"int") == 0){
 			strcpy(function_pra_type,"I");
 		}
-		else if( strcmp($1,"flaot") == 0){
+		else if( strcmp($1,"float") == 0){
 			strcpy(function_pra_type,"F");
 		}
 		else if( strcmp($1,"bool") == 0){
@@ -715,11 +717,12 @@ parameter_list
 		strcat(attribute_buf,", ");
 		strcat(attribute_buf,$3);
 		strcat(attribute_buf,"\0");
+		printf("type:%si\n",$3);
 		//Jcode用的type
 		if( strcmp($3,"int") == 0){
             strcat(function_pra_type,"I");
         }
-        else if( strcmp($3,"flaot") == 0){
+        else if( strcmp($3,"float") == 0){
             strcat(function_pra_type,"F");
         }
 		else if( strcmp($3,"bool") == 0){
@@ -754,7 +757,8 @@ assignment_expression
 		assign_right = 0;//完成之後要把flag設回去
 		//"="符號
 		if($2 == 1){
-			//不是global
+			ASGNfunction($1,$4);
+/*			//不是global
 			if(getStackindex($1) != -1){
 				//等號左邊是int
 				if(lookNglobal_type($1) == 1){
@@ -775,7 +779,7 @@ assignment_expression
 				else if(lookNglobal_type($1) == 2){
 					//右邊是int
 					if(exe_float_flag == 0){
-						sprintf(Jcode_buf,"\ti2f\n");
+						sprintf(Jcode_buf,"\ti2f");
 						writeCode(Jcode_buf);
 						sprintf(Jcode_buf,"\tfstore %d",getStackindex($1));
 						writeCode(Jcode_buf);
@@ -814,7 +818,7 @@ assignment_expression
                 else if(lookglobal_type($1) == 2){
                     //右邊是int
                     if(exe_float_flag == 0){
-                        sprintf(Jcode_buf,"\ti2f\n");
+                        sprintf(Jcode_buf,"\ti2f");
                         writeCode(Jcode_buf);
                         sprintf(Jcode_buf,"\tputstatic compiler_hw3/%s F",$1);
                         writeCode(Jcode_buf);
@@ -834,7 +838,7 @@ assignment_expression
 
 			}
 			exe_float_flag = 0;//回歸沒有
-		}
+*/		}
 		//是“+=”
 		else if($2 == 2){
 			printf("test:%s\n",$4);
@@ -849,6 +853,7 @@ assignment_expression
 			MULASGNfunction($1,$4);
 		}
 		else if($2 == 5){
+			DIVASGNfunction($1,$4);
 		}
 		else if($2 == 6){
 			MODASGNfunction($1,$4);
@@ -1786,6 +1791,7 @@ int getStackindex(char* var_name){
 	int i;
 	int scope;
 	int stack_index=0;
+	int real_stack_index=-2;
 	Node* tempnode;
 	tempnode = First;
 	while(tempnode!=NULL){
@@ -1793,10 +1799,11 @@ int getStackindex(char* var_name){
 		for(i = 0 ; i < tempnode->var_index ; i++){
 			if(strcmp(var_name,tempnode->STable[i].name) == 0){
 				if(scope == 0){
-					return -1;
+					real_stack_index = -1;
 				}
 				else{
-					return stack_index;
+					real_stack_index = stack_index;
+					stack_index++;
 				}
 			}
 			else{
@@ -1808,7 +1815,7 @@ int getStackindex(char* var_name){
 		}
 		tempnode = tempnode->next;
 	}
-	return -2;
+	return real_stack_index;
 
 }
 int lookglobal_type(char* var_name){
@@ -1896,7 +1903,7 @@ int check_zero(char* var_name){
 	if(strcmp( var_name,"IZERO") == 0 || strcmp(var_name,"FZERO") == 0){
 		is_zero = 1;
 	}
-	else{
+/*	else{
 
 		while(tempnode != NULL){
 			for(i = 0 ; i < tempnode->var_index ; i++){
@@ -1912,7 +1919,7 @@ int check_zero(char* var_name){
 			tempnode = tempnode->next;
 		}
 	}
-
+*/
 	return is_zero;
 }
 void Loadfunction(char* left){
@@ -1945,12 +1952,12 @@ void Storefunction(char* left,char* right){
 		//等號左邊是int
 		if(lookNglobal_type(left) == 1){
 			//右邊是int
-			if(lookNglobal_type(right) == 1){
+			if(lookNglobal_type(right) == 1 || lookglobal_type(right) == 1){
 				sprintf(Jcode_buf,"\tistore %d",getStackindex(left));
 				writeCode(Jcode_buf);
 			}
 			//右邊是float
-			else if(lookNglobal_type(right) == 2){
+			else if(lookNglobal_type(right) == 2 || lookglobal_type(right) == 2){
 				sprintf(Jcode_buf,"\tf2i");
 				writeCode(Jcode_buf);
 				sprintf(Jcode_buf,"\tistore %d",getStackindex(left));
@@ -1960,12 +1967,12 @@ void Storefunction(char* left,char* right){
 		//等號左邊是float
 		else if(lookNglobal_type(left) == 2){
 			//右邊是int//不需要i2f，因為先做運算之後就會變成float了
-			if(lookNglobal_type(right) == 1){
+			if(lookNglobal_type(right) == 1 || lookglobal_type(right) == 1){
 				sprintf(Jcode_buf,"\tfstore %d",getStackindex(left));
 				writeCode(Jcode_buf);
 			}
 			//右邊是float
-			else if(lookNglobal_type(right) == 2){
+			else if(lookNglobal_type(right) == 2 || lookglobal_type(right) == 2){
 				sprintf(Jcode_buf,"\tfstore %d",getStackindex(left));
 				writeCode(Jcode_buf);
 			}
@@ -1982,12 +1989,12 @@ void Storefunction(char* left,char* right){
 		//等號左邊是int
 		if(lookglobal_type(left) == 1){
 			//右邊是int
-			if(lookglobal_type(right) == 1){
+			if(lookglobal_type(right) == 1 || lookNglobal_type(right) == 1){
 				sprintf(Jcode_buf,"\tputstatic compiler_hw3/%s I",left);
 				writeCode(Jcode_buf);
 			}   
 			//右邊是float
-			else if(lookglobal_type(right)  == 2){
+			else if(lookglobal_type(right)  == 2 || lookNglobal_type(right) == 1){
 				sprintf(Jcode_buf,"\tf2i");
 				writeCode(Jcode_buf);
 				sprintf(Jcode_buf,"\tputstatic compiler_hw3/%s I",left);
@@ -1997,12 +2004,93 @@ void Storefunction(char* left,char* right){
 		//等號左邊是float
 		else if(lookglobal_type(left) == 2){
 			//右邊是int//不需要i2f，因為先做運算之後就會變成float了
-			if(lookglobal_type(right) == 1){
+			if(lookglobal_type(right) == 1 || lookNglobal_type(right) == 1){
 				sprintf(Jcode_buf,"\tputstatic compiler_hw3/%s F",left);
 				writeCode(Jcode_buf);
 			}   
 			//右邊是float
-			else if(lookglobal_type(right) == 2){
+			else if(lookglobal_type(right) == 2 || lookNglobal_type(right) == 2){
+				sprintf(Jcode_buf,"\tputstatic compiler_hw3/%s F",left);
+				writeCode(Jcode_buf);
+			}   
+		}
+		//等號左邊是bool
+		else if(lookglobal_type(left) == 4){
+			sprintf(Jcode_buf,"\tputstatic compiler_hw3/%s I",left);
+			writeCode(Jcode_buf);
+		}
+		//string不用考慮先宣告再賦值
+
+	}
+}
+void ASGNfunction(char* left,char* right){
+	//不是global
+	if(getStackindex(left) != -1){
+		//等號左邊是int
+		if(lookNglobal_type(left) == 1){
+			//右邊是int
+			if(lookNglobal_type(right) == 1 || lookglobal_type(right) == 1){
+				sprintf(Jcode_buf,"\tistore %d",getStackindex(left));
+				writeCode(Jcode_buf);
+			}
+			//右邊是float
+			else if(lookNglobal_type(right) == 2 || lookglobal_type(right) == 2){
+				sprintf(Jcode_buf,"\tf2i");
+				writeCode(Jcode_buf);
+				sprintf(Jcode_buf,"\tistore %d",getStackindex(left));
+				writeCode(Jcode_buf);
+			}
+		}
+		//等號左邊是float
+		else if(lookNglobal_type(left) == 2){
+			//右邊是int
+			if(lookNglobal_type(right) == 1 || lookglobal_type(right) == 1){
+				sprintf(Jcode_buf,"\ti2f");
+				writeCode(Jcode_buf);
+				sprintf(Jcode_buf,"\tfstore %d",getStackindex(left));
+				writeCode(Jcode_buf);
+			}
+			//右邊是float
+			else if(lookNglobal_type(right) == 2 || lookglobal_type(right) == 2){
+				sprintf(Jcode_buf,"\tfstore %d",getStackindex(left));
+				writeCode(Jcode_buf);
+			}
+		}
+		//等號左邊是bool
+		else if(lookNglobal_type(left) == 4){
+			sprintf(Jcode_buf,"\tistore %d",getStackindex(left));
+			writeCode(Jcode_buf);
+		}
+		//string不用考慮先宣告才賦值
+	}
+	//是global
+	else if(getStackindex(left) == -1){
+		//等號左邊是int
+		if(lookglobal_type(left) == 1){
+			//右邊是int
+			if(lookglobal_type(right) == 1 || lookNglobal_type(right) == 1){
+				sprintf(Jcode_buf,"\tputstatic compiler_hw3/%s I",left);
+				writeCode(Jcode_buf);
+			}   
+			//右邊是float
+			else if(lookglobal_type(right)  == 2 || lookNglobal_type(right) == 1){
+				sprintf(Jcode_buf,"\tf2i");
+				writeCode(Jcode_buf);
+				sprintf(Jcode_buf,"\tputstatic compiler_hw3/%s I",left);
+				writeCode(Jcode_buf);
+			}   
+		}   
+		//等號左邊是float
+		else if(lookglobal_type(left) == 2){
+			//右邊是int
+			if(lookglobal_type(right) == 1 || lookNglobal_type(right) == 1){
+				sprintf(Jcode_buf,"\ti2f");
+                writeCode(Jcode_buf);  
+				sprintf(Jcode_buf,"\tputstatic compiler_hw3/%s F",left);
+				writeCode(Jcode_buf);
+			}   
+			//右邊是float
+			else if(lookglobal_type(right) == 2 || lookNglobal_type(right) == 2){
 				sprintf(Jcode_buf,"\tputstatic compiler_hw3/%s F",left);
 				writeCode(Jcode_buf);
 			}   
@@ -2083,12 +2171,12 @@ void ADDASGNfunction(char* left , char* right){
 		//等號左邊是int
 		if(lookNglobal_type(left) == 1){
 			//右邊是int
-			if(lookNglobal_type(right) == 1){
+			if(lookNglobal_type(right) == 1 || lookglobal_type(right) == 1){
 				sprintf(Jcode_buf,"\tistore %d",getStackindex(left));
 				writeCode(Jcode_buf);
 			}
 			//右邊是float
-			else if(lookNglobal_type(right) == 2){
+			else if(lookNglobal_type(right) == 2 || lookglobal_type(right) == 2){
 				sprintf(Jcode_buf,"\tf2i");
 				writeCode(Jcode_buf);
 				sprintf(Jcode_buf,"\tistore %d",getStackindex(left));
@@ -2098,12 +2186,12 @@ void ADDASGNfunction(char* left , char* right){
 		//等號左邊是float
 		else if(lookNglobal_type(left) == 2){
 			//右邊是int//不需要i2f，因為先做運算之後就會變成float了
-			if(lookNglobal_type(right) == 1){
+			if(lookNglobal_type(right) == 1 || lookglobal_type(right) == 1){
 				sprintf(Jcode_buf,"\tfstore %d",getStackindex(left));
 				writeCode(Jcode_buf);
 			}
 			//右邊是float
-			else if(lookNglobal_type(right) == 2){
+			else if(lookNglobal_type(right) == 2 || lookglobal_type(right) == 2){
 				sprintf(Jcode_buf,"\tfstore %d",getStackindex(left));
 				writeCode(Jcode_buf);
 			}
@@ -2120,12 +2208,12 @@ void ADDASGNfunction(char* left , char* right){
 		//等號左邊是int
 		if(lookglobal_type(left) == 1){
 			//右邊是int
-			if(lookglobal_type(right) == 1){
+			if(lookglobal_type(right) == 1 || lookNglobal_type(right) == 1){
 				sprintf(Jcode_buf,"\tputstatic compiler_hw3/%s I",left);
 				writeCode(Jcode_buf);
 			}   
 			//右邊是float
-			else if(lookglobal_type(right)  == 2){
+			else if(lookglobal_type(right)  == 2 || lookNglobal_type(right) == 2){
 				sprintf(Jcode_buf,"\tf2i");
 				writeCode(Jcode_buf);
 				sprintf(Jcode_buf,"\tputstatic compiler_hw3/%s I",left);
@@ -2135,12 +2223,12 @@ void ADDASGNfunction(char* left , char* right){
 		//等號左邊是float
 		else if(lookglobal_type(left) == 2){
 			//右邊是int//不需要i2f，因為先做運算之後就會變成float了
-			if(lookglobal_type(right) == 1){
+			if(lookglobal_type(right) == 1 || lookNglobal_type(right) == 1){
 				sprintf(Jcode_buf,"\tputstatic compiler_hw3/%s F",left);
 				writeCode(Jcode_buf);
 			}   
 			//右邊是float
-			else if(lookglobal_type(right) == 2){
+			else if(lookglobal_type(right) == 2 || lookglobal_type(right) == 2){
 				sprintf(Jcode_buf,"\tputstatic compiler_hw3/%s F",left);
 				writeCode(Jcode_buf);
 			}   
@@ -2309,6 +2397,17 @@ void DIVfunction(char* left,char*right){
         exe_float_flag = 1;                                                                                                                                   
     }
 }
+void DIVASGNfunction(char* left,char* right){
+    //load出來
+    Loadfunction(left);
+    //要swap
+    sprintf(Jcode_buf,"\tswap");
+    writeCode(Jcode_buf);
+    //做DIV
+    DIVfunction(left,right);
+    //存回去
+    Storefunction(left,right);
+}
 void RE_cha_function(char* left,char* right){
     //處理比較時要換type的問題
     //兩個都是int->兩個都換成float
@@ -2329,4 +2428,100 @@ void RE_cha_function(char* left,char* right){
 		print_semantic_flag = 1;
 		strcpy(message_buf,"這次比較不用考慮兩種不一樣的型態");
     } 	
+}
+void De_ASGNfunction(char* left,char* var_name , char* right){
+	char* name;
+	name = strdup(var_name);
+	printf("infun:%s\n",name);
+	if(scope_flag == 0){
+		if( strcmp(left,"float") == 0){
+			sprintf(Jcode_buf,".field public static %s F = %f",name,global_float);
+			writeCode(Jcode_buf);
+			global_float = 0;
+		}
+		else if( strcmp(left,"int") == 0){
+			sprintf(Jcode_buf,".field public static %s I = %d",name,global_int);
+			writeCode(Jcode_buf);
+			global_int = 0;
+		}
+		else if( strcmp(left,"string")==0){
+			sprintf(Jcode_buf,".field public static %s Ljava/lang/String; = \"%s\"",name,global_string);
+			writeCode(Jcode_buf);
+			strcpy(global_string,"");
+		}
+		else if( strcmp(left,"bool") ==0){
+			sprintf(Jcode_buf,".field public static %s I = %d",name,global_bool);
+			writeCode(Jcode_buf);
+			global_bool = 0;
+		}
+		//算式結束設回去
+		noinitial_flag = 0;
+	}
+	//宣告的地方不是global的
+	else{
+		//如果後面沒有float
+		printf("aaaaa:%d,%d\n",lookglobal_type(right),lookNglobal_type(right));
+		if( noinitial_flag == 1){
+		    //沒有初始化
+			sprintf(Jcode_buf,"\tldc 0");
+			writeCode(Jcode_buf);
+			if(strcmp(left,"int") ==0){
+				sprintf(Jcode_buf,"\tistore %d",getStackindex(name));
+				writeCode(Jcode_buf);
+            }
+			else if(strcmp(left,"float")==0){
+                sprintf(Jcode_buf,"\ti2f");
+                writeCode(Jcode_buf);
+                sprintf(Jcode_buf,"\tfstore %d",getStackindex(name));
+                writeCode(Jcode_buf);
+            }
+			noinitial_flag = 0;
+
+		}
+		//如果後面沒有float
+		if( lookNglobal_type(right) == 1){
+			if(strcmp(left,"int")==0){
+				sprintf(Jcode_buf,"\tistore %d",getStackindex(name));
+				writeCode(Jcode_buf);
+			}
+			else if(strcmp(left,"float")==0){
+				sprintf(Jcode_buf,"\ti2f");
+				writeCode(Jcode_buf);
+				sprintf(Jcode_buf,"\tfstore %d",getStackindex(name));
+				writeCode(Jcode_buf);
+			}
+		}
+		//如果後面有float
+		else if( lookNglobal_type(right) == 2){
+			if(strcmp(left,"int")==0){
+				sprintf(Jcode_buf,"\tf2i");
+				writeCode(Jcode_buf);
+				sprintf(Jcode_buf,"\tistore %d",getStackindex(name));
+				writeCode(Jcode_buf);
+			}
+			else if(strcmp(left,"float")==0){
+				sprintf(Jcode_buf,"\tfstore %d",getStackindex(name));
+				writeCode(Jcode_buf);
+			}
+		}
+
+		//跟上面沒關係，如果宣告的是string
+		if( strcmp(left,"string") == 0){
+			sprintf(Jcode_buf,"\tastore %d",getStackindex(name));
+			writeCode(Jcode_buf);
+		}
+		//跟上面沒關係，如果宣告的是bool
+		if( strcmp(left,"bool") == 0){
+			//沒有初始化
+			if(noinitial_flag ==1){
+				sprintf(Jcode_buf,"\tldc 0");
+				writeCode(Jcode_buf);
+				noinitial_flag = 0;
+			}
+			sprintf(Jcode_buf,"\tistore %d",getStackindex(name));
+			writeCode(Jcode_buf);
+		}
+	}
+	exe_float_flag = 0;
+
 }

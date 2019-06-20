@@ -16,13 +16,29 @@ lex.yy.c:
 y.tab.c:
 	@yacc ${YFLAG} ${FNAME}.y
 
-test:
+if:
 	@./${PARSER} < ./example_input/basic_if_statement.c
 	@echo -e "\n\033[1;33mmain.class output\033[0m"
 	@java -jar jasmin.jar ${FNAME}.j
 	@java ${FNAME} 
 while:
 	@./${PARSER} < ./example_input/basic_while_statement.c
+	@echo -e "\n\033[1;33mmain.class output\033[0m"
+	@java -jar jasmin.jar ${FNAME}.j
+	@java ${FNAME}
+declare:
+	@./${PARSER} < ./example_input/declaration.c
+	@echo -e "\n\033[1;33mmain.class output\033[0m"
+	@java -jar jasmin.jar ${FNAME}.j
+	@java ${FNAME}
+function:
+	@./${PARSER} < ./example_input/basic_function.c
+	@echo -e "\n\033[1;33mmain.class output\033[0m"
+	@java -jar jasmin.jar ${FNAME}.j
+	@java ${FNAME}
+
+alltest:
+	@./${PARSER} < ./example_input/all.c
 	@echo -e "\n\033[1;33mmain.class output\033[0m"
 	@java -jar jasmin.jar ${FNAME}.j
 	@java ${FNAME}
